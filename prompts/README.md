@@ -16,6 +16,7 @@ Most prompts work with a private study repository. Some can also help prepare pu
 | [`generate-flashcards.md`](generate-flashcards.md) | Create atomic, source-backed flashcards from course notes | No — works with private notes |
 | [`prepare-for-an-exam.md`](prepare-for-an-exam.md) | Build a time-boxed study plan before an exam | No — works with private notes |
 | [`log-a-mistake.md`](log-a-mistake.md) | Log a mistake in the structured Mistake Log format after a quiz or practice attempt | No — works with private mistakes |
+| [`sanitize-for-public-release.md`](sanitize-for-public-release.md) | Create a sanitized public-release candidate from a private notes repository | Yes — this is the sanitization workflow |
 | [`update-status.md`](update-status.md) | Decide whether a note's status should change based on evidence | No — works with private notes and mistakes |
 | [`weekly-review.md`](weekly-review.md) | Plan a week of review targeting weak topics and stale dates | No — works with private notes and mistakes |
 

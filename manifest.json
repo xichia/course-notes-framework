@@ -1,7 +1,7 @@
 {
   "_generated": "GENERATED FILE. DO NOT EDIT. Rebuild with: make manifest (or python3 build_manifest.py).",
   "format-version": 3,
-  "generated-at": "2026-07-01",
+  "generated-at": "2026-07-02",
   "how-to-use": [
     "Filter by course, type, topic, status, exam-weight, visibility, source-risk, aliases, mistakes, or practice coverage.",
     "Read summary and headings to choose notes, then open only the listed file paths you need.",
