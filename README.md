@@ -106,6 +106,8 @@ Never edit `manifest.json` or `REVIEW_QUEUE.md` manually. Update source Markdown
 | `make test` | Run the dependency-free regression suite |
 | `make pre-release` | Run the public-release gate, regenerate all files, and run tests (for release readiness) |
 | `make all` | Run normal validation, both generators, and all tests |
+| `make reviewed NOTE=layered-recall` | Update `last-reviewed` and `review-after` for a note by ID (see below) |
+| `make reviewed NOTE=layered-recall DATE=2026-07-15` | As above, using a specific review date |
 | `python3 build_review_queue.py --today YYYY-MM-DD` | Generate the review queue for a specific date |
 
 The equivalent direct Python commands are shown in Quickstart.
@@ -125,6 +127,33 @@ MATH123
 ```
 
 When present, `make validate-public` scans all Markdown files for these terms and reports each match as an error. This is a safety smoke alarm — it does not replace manual review. Remove or replace any blocked terms before publishing.
+
+### Mark a note as reviewed
+
+After studying a note, update its review metadata with:
+
+```bash
+make reviewed NOTE=layered-recall
+```
+
+Or with a specific date:
+
+```bash
+make reviewed NOTE=layered-recall DATE=2026-07-15
+```
+
+The script updates only `last-reviewed` and `review-after`. It does not change `status`, `visibility`, `source-risk`, or any other frontmatter. The next review date is chosen from the current status:
+
+| Status | Next review |
+|---|---|
+| `new` | +1 day |
+| `shaky` | +2 days |
+| `learning` | +7 days |
+| `solid` | +30 days |
+| `mastered` | +60 days |
+| `reference` / `archived` | blank |
+
+Run `make all` after the update to regenerate the manifest and review queue.
 
 ## Adding a new course
 
@@ -159,7 +188,7 @@ Keep filenames readable and stable. A concept note should grow as understanding 
 1. Run `make review` (or `python3 build_review_queue.py`).
 2. Open `REVIEW_QUEUE.md`, or give `prompts/daily-study.md` to an LLM with repository access.
 3. Study the highest-priority item through active recall before rereading it.
-4. Update review dates and Mistake Log items only after checking your performance.
+4. Update review dates and Mistake Log items only after checking your performance. Use `make reviewed NOTE=<id>` to update dates quickly.
 5. Run `make all` after changing source notes.
 
 For a weekly planning session, run `make all`, then use `prompts/weekly-review.md` with the refreshed manifest and queue.

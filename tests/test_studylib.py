@@ -1,11 +1,12 @@
 import json
 import tempfile
 import unittest
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 from build_manifest import GENERATED_WARNING as MANIFEST_WARNING, build_manifest
 from build_review_queue import GENERATED_WARNING as REVIEW_WARNING, build_queue, is_review_candidate, rank_note
+from mark_reviewed import mark_reviewed
 from studylib import (
     ROOT,
     Note,
@@ -461,6 +462,142 @@ class StudyLibTests(unittest.TestCase):
         self.assertEqual(1, len(matching))
         self.assertIn("blocklist-test.md", matching[0].file)
         self.assertIn("demo-lms.example", matching[0].message)
+
+
+    # --- mark_reviewed tests ---
+
+    def _make_review_note(self, temp_dir, note_id="test-review-id", status="learning",
+                          last_reviewed="", review_after="", course_override=None):
+        """Write a valid concept note below *temp_dir* and return its path."""
+        course = course_override or Path(temp_dir).name
+        path = Path(temp_dir) / "concepts" / f"{note_id}.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        text = f"""---
+id: {note_id}
+title: Test Review Note
+course: {course}
+type: concept
+topic: testing
+aliases: []
+prerequisites: []
+related: []
+exam-weight: medium
+status: {status}
+last-reviewed: {last_reviewed}
+review-after: {review_after}
+source: "Test fixture"
+visibility: private
+source-risk: original
+---
+
+# Test Review Note
+
+## Definition
+
+A fixture.
+
+## Intuition
+
+An intuition.
+
+## Worked Example
+
+An example.
+
+## Common Mistakes
+
+- A general warning.
+
+## Mistake Log
+
+_No personal mistakes logged yet._
+
+## Practice Questions
+
+### Easy
+
+- Test question.
+
+### Medium
+
+_No practice questions recorded yet._
+
+### Exam-style
+
+- Test question B.
+
+## Related
+
+_None._
+"""
+        path.write_text(text, encoding="utf-8")
+        return path
+
+    def test_mark_reviewed_updates_dates(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "courses") as td:
+            self._make_review_note(td, "review-test-01", status="learning")
+            ret = mark_reviewed("review-test-01", date(2026, 7, 2))
+            self.assertEqual(0, ret)
+            path = Path(td) / "concepts" / "review-test-01.md"
+            content = path.read_text(encoding="utf-8")
+            self.assertIn("last-reviewed: 2026-07-02", content)
+            self.assertIn("review-after: 2026-07-09", content)
+
+    def test_mark_reviewed_no_match(self):
+        ret = mark_reviewed("nonexistent-id-that-surely-does-not-exist", date(2026, 7, 2))
+        self.assertEqual(1, ret)
+
+    def test_mark_reviewed_duplicate_ids(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "courses") as td1, \
+             tempfile.TemporaryDirectory(dir=ROOT / "courses") as td2:
+            self._make_review_note(td1, "duplicate-id", course_override=Path(td1).name)
+            self._make_review_note(td2, "duplicate-id", course_override=Path(td2).name)
+            ret = mark_reviewed("duplicate-id", date(2026, 7, 2))
+            self.assertEqual(1, ret)
+
+    def test_mark_reviewed_date_override(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "courses") as td:
+            self._make_review_note(td, "date-override-test", status="new")
+            ret = mark_reviewed("date-override-test", date(2026, 5, 1))
+            self.assertEqual(0, ret)
+            path = Path(td) / "concepts" / "date-override-test.md"
+            content = path.read_text(encoding="utf-8")
+            self.assertIn("last-reviewed: 2026-05-01", content)
+            self.assertIn("review-after: 2026-05-02", content)
+
+    def test_mark_reviewed_cadence_by_status(self):
+        cases = [("new", 1), ("shaky", 2), ("learning", 7), ("solid", 30), ("mastered", 60)]
+        base = date(2026, 6, 1)
+        for status, offset in cases:
+            with self.subTest(status=status):
+                with tempfile.TemporaryDirectory(dir=ROOT / "courses") as td:
+                    nid = f"cadence-{status}"
+                    self._make_review_note(td, nid, status=status)
+                    ret = mark_reviewed(nid, base)
+                    self.assertEqual(0, ret)
+                    path = Path(td) / "concepts" / f"{nid}.md"
+                    content = path.read_text(encoding="utf-8")
+                    expected = (base + timedelta(days=offset)).isoformat()
+                    self.assertIn(f"review-after: {expected}", content)
+
+    def test_mark_reviewed_status_unchanged(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "courses") as td:
+            self._make_review_note(td, "status-check", status="shaky")
+            ret = mark_reviewed("status-check", date(2026, 7, 2))
+            self.assertEqual(0, ret)
+            path = Path(td) / "concepts" / "status-check.md"
+            content = path.read_text(encoding="utf-8")
+            self.assertIn("status: shaky", content)
+
+    def test_mark_reviewed_visibility_unchanged(self):
+        with tempfile.TemporaryDirectory(dir=ROOT / "courses") as td:
+            self._make_review_note(td, "vis-check", status="learning")
+            ret = mark_reviewed("vis-check", date(2026, 7, 2))
+            self.assertEqual(0, ret)
+            path = Path(td) / "concepts" / "vis-check.md"
+            content = path.read_text(encoding="utf-8")
+            self.assertIn("visibility: private", content)
+            self.assertIn("source-risk: original", content)
 
 
 if __name__ == "__main__":

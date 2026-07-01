@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: validate validate-public manifest review test all pre-release
+.PHONY: validate validate-public manifest review test all pre-release reviewed
 
 validate:
 	$(PYTHON) validate_notes.py
@@ -22,6 +22,9 @@ pre-release:
 	$(PYTHON) build_manifest.py
 	$(PYTHON) build_review_queue.py
 	$(PYTHON) -m unittest discover -s tests -v
+
+reviewed:
+	$(PYTHON) mark_reviewed.py $(NOTE) $(DATE:%=--date %)
 
 all:
 	$(PYTHON) validate_notes.py
