@@ -1,6 +1,6 @@
 # Synthetic Demo Course
 
-This fictional course exists only to demonstrate the framework. It contains no university, lecturer, LMS, assessment, or real course-derived material.
+This fictional course exists only to demonstrate Course Notes. It contains no university, lecturer, LMS, assessment, or real course-derived material.
 
 ## Navigation
 

@@ -1,10 +1,10 @@
-# Course Notes Study System
+# Course Notes
 
-A Markdown-first system for durable university notes, selective LLM retrieval, exam preparation, and spaced review. Markdown files under `courses/` are the source of truth; the manifest and review queue are generated views.
+A Markdown-first system for durable learning notes, selective LLM retrieval, review queues, and study workflows. Markdown files under `courses/` are the source of truth; the manifest and review queue are generated views.
 
-> This is a sanitized public-framework candidate. Its only course tree is explicitly synthetic and contains no real university course material.
+> This is a sanitized public-release candidate. Its only course tree is explicitly synthetic and contains no real university course material.
 >
-> License: MIT. See [LICENSE](LICENSE). The framework, scripts, templates, prompts, and documentation are MIT licensed. Real course-derived notes should not be published through this repository unless separately cleared.
+> License: MIT. See [LICENSE](LICENSE). The scripts, templates, prompts, and documentation are MIT licensed. Real course-derived notes should not be published through this repository unless separately cleared.
 
 ## Quickstart
 
@@ -39,28 +39,28 @@ Make is only a convenience; the scripts require Python 3, use only the standard 
 
 ## Public/private content policy
 
-The publishable work in this repository is the original study framework, not reproduced lecture material.
+The publishable work in this repository is original study material, not reproduced lecture material.
 
-| Public framework material | Private by default |
+| Public Course Notes material | Private by default |
 |---|---|
 | Templates, scripts, prompts, docs, metadata schemas, validation logic, generated-file conventions, and synthetic examples | Real lecture-derived notes, problem sheets, exam maps/questions, lecturer hints, LMS material, assessment material, personal study evidence, and course-specific examples |
 
-Keep the real study repository private when it contains actual course notes. If a public version is useful, create a separately reviewed, sanitized framework-only repository using synthetic/demo content. AI summarization or paraphrasing alone does not make protected course material safe to publish.
+Keep the real study repository private when it contains actual course notes. If a public version is useful, create a separately reviewed, sanitized public repository using synthetic/demo content. AI summarization or paraphrasing alone does not make protected course material safe to publish.
 
 Read [docs/publication-policy.md](docs/publication-policy.md) before changing visibility or preparing a release, and use [docs/public-release-checklist.md](docs/public-release-checklist.md) before making any repository public.
 
 This sanitized candidate contains only `public-framework` or `public-original` notes with `source-risk: original`; `make validate-public` must pass before release.
 
-### Public framework vs private notes
+### Public vs private notes
 
-This repository is the public framework. It contains tooling, templates, prompts, documentation, validation logic, and synthetic/demo content.
+This repository is a public Course Notes repository. It contains tooling, templates, prompts, documentation, validation logic, and synthetic/demo content.
 
-Real course notes should live in a separate private repository or private copy. A private notes repository may intentionally fail `make validate-public` because it can contain `visibility: private` or course-derived material. A public framework release must always pass `make pre-release`.
+Real course notes should live in a separate private repository or private copy. A private notes repository may intentionally fail `make validate-public` because it can contain `visibility: private` or course-derived material. A public release must always pass `make pre-release`.
 
 ## Repository Structure
 
 ```text
-course-notes-framework/
+course-notes/
 ├── courses/
 │   └── <course-code>/
 │       ├── course.md          course metadata, resources, and priorities
@@ -81,7 +81,7 @@ course-notes-framework/
 └── REVIEW_QUEUE.md                 generated ranked review list
 ```
 
-The included `courses/demo-course/` tree is fictional and exists only to demonstrate the framework. Replace it with other synthetic material—not real course notes—when preparing a public variant.
+The included `courses/demo-course/` tree is fictional and exists only to demonstrate the system. Replace it with other synthetic material—not real course notes—when preparing a public variant.
 
 ## Source of Truth and Generated Files
 

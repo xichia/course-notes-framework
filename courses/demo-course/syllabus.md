@@ -11,14 +11,14 @@ exam-weight: none
 status: reference
 last-reviewed:
 review-after:
-source: "Synthetic framework example written for this repository"
+source: "Synthetic example written for this repository"
 visibility: public-framework
 source-risk: original
 ---
 
 # Synthetic Demo Syllabus
 
-> This is fictional framework data, not an official syllabus or summary of a real course.
+> This is fictional demo data, not an official syllabus or summary of a real course.
 
 ## Official Learning Outcomes
 
@@ -29,8 +29,8 @@ source-risk: original
 
 | Week | Synthetic topic | Source |
 |---:|---|---|
-| 1 | Repository navigation | Synthetic framework example |
-| 2 | Review workflow | Synthetic framework example |
+| 1 | Repository navigation | Synthetic example |
+| 2 | Review workflow | Synthetic example |
 
 ## Assessment Topics
 
@@ -50,4 +50,4 @@ _None—there is no lecturer._
 
 ## Source Links or References
 
-- Synthetic content authored for this public framework candidate.
+- Synthetic content authored for this public Course Notes release.

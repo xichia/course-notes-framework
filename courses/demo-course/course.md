@@ -1,6 +1,6 @@
 ---
 id: demo-course-overview
-title: Synthetic Study Framework Demo
+title: Course Notes Demo
 course: demo-course
 type: reference
 topic: course-overview
@@ -11,19 +11,19 @@ exam-weight: none
 status: reference
 last-reviewed:
 review-after:
-source: "Synthetic framework example written for this repository"
+source: "Synthetic example written for this repository"
 visibility: public-framework
 source-risk: original
 ---
 
-# Synthetic Study Framework Demo
+# Course Notes Demo
 
 ## Course Details
 
 | Field | Value |
 |---|---|
 | Course code | `demo-course` |
-| Course title | Synthetic Study Framework Demo |
+| Course title | Course Notes Demo |
 | Term | Fictional demonstration term |
 | Lecturer | None—synthetic example |
 | Exam date | None—synthetic example |

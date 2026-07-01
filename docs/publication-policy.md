@@ -2,11 +2,11 @@
 
 ## Principle
 
-The public value of this repository is the original study framework: its Markdown organization, templates, scripts, prompts, metadata schema, validation rules, review engine, generated indexes, and LLM workflows. Course material is factual input to a private study process; publishing protected lecture expression is not part of the framework.
+The public value of this repository is the original study system: its Markdown organization, templates, scripts, prompts, metadata schema, validation rules, review engine, generated indexes, and LLM workflows. Course material is factual input to a private study process; publishing protected lecture expression is not part of this repository.
 
 ## Public by Design
 
-The following are suitable for a sanitized framework repository when they contain no embedded course material:
+The following are suitable for a public Course Notes repository when they contain no embedded course material:
 
 - generic templates and synthetic examples;
 - validation, manifest, and review-queue scripts;
@@ -65,7 +65,7 @@ Never upgrade `visibility` from `private` or classify something as `open-license
 
 ## Release Rule
 
-Use `make validate-public` only on a manually sanitized framework candidate. It intentionally fails on private, course-derived, unknown-risk, or unclassified notes. Passing the automated check is necessary but not sufficient: complete the [public release checklist](public-release-checklist.md) and manually review every file before publishing.
+Use `make validate-public` only on a manually sanitized public-release candidate. It intentionally fails on private, course-derived, unknown-risk, or unclassified notes. Passing the automated check is necessary but not sufficient: complete the [public release checklist](public-release-checklist.md) and manually review every file before publishing.
 
 When in doubt, keep the material private.
 

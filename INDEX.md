@@ -1,6 +1,6 @@
 # Index
 
-Human navigation for the sanitized framework candidate. For machine-readable filtering, use [`manifest.json`](manifest.json). For the ranked demo list, use [`REVIEW_QUEUE.md`](REVIEW_QUEUE.md).
+Human navigation for the public-release candidate. For machine-readable filtering, use [`manifest.json`](manifest.json). For the ranked demo list, use [`REVIEW_QUEUE.md`](REVIEW_QUEUE.md).
 
 ## Synthetic Demo Course
 

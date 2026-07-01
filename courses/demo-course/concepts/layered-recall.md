@@ -11,7 +11,7 @@ exam-weight: medium
 status: learning
 last-reviewed: 2026-07-01
 review-after: 2026-07-08
-source: "Synthetic framework example written for this repository"
+source: "Synthetic example written for this repository"
 visibility: public-original
 source-risk: original
 ---

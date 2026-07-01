@@ -1,6 +1,6 @@
 # Public Release Checklist
 
-Use this checklist on a separate sanitized framework candidate. Do not turn the real private study repository public merely because an automated check passes.
+Use this checklist on a separate sanitized public-release candidate. Do not turn the real private study repository public merely because an automated check passes.
 
 ## Remove Private Course Material
 
@@ -47,7 +47,7 @@ make test
 
 - [ ] Review the complete Git diff and staged file list manually.
 - [ ] Open representative rendered Markdown files on GitHub or a previewer.
-- [ ] Confirm the repository communicates that its value is the framework, not course-material publication.
+- [ ] Confirm the repository communicates that its value is the study system, not course-material publication.
 - [ ] Push only after this manual review is complete.
 
 Passing this checklist is a release decision, not legal clearance. See [publication policy](publication-policy.md).

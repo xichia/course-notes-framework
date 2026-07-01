@@ -19,7 +19,7 @@ Never edit generated files directly. Update source Markdown and run the generato
 - Treat course-derived content and personal study evidence as private by default.
 - Do not prepare public-facing versions of lecture-derived notes unless explicitly instructed to sanitize a separate release candidate.
 - Sanitization must remove protected expression, lecturer-specific examples and hints, LMS references, problem-sheet text, exam questions, assessment material, and close paraphrases—not merely rewrite them.
-- Prefer synthetic examples or independently written generic explanations in public-facing framework material.
+- Prefer synthetic examples or independently written generic explanations in public-facing Course Notes material.
 - Preserve `visibility` and `source-risk` metadata during every edit or conversion.
 - Never upgrade `visibility` from `private` or change `source-risk` to `open-licensed` without explicit instruction and evidence.
 - Mark uncertain provenance as `source-risk: unknown` and keep it private.

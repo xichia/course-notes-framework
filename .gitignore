@@ -14,3 +14,31 @@ env/
 *~
 .DS_Store
 Thumbs.db
+
+# Private or copyright-risky course/source materials.
+# Keep raw source material out of Git; publish only original notes.
+raw/
+sources/
+source-materials/
+course-materials/
+lms/
+slides/
+recordings/
+transcripts/
+handouts/
+problem-sheets-raw/
+exam-materials-raw/
+private/
+
+# Common source-material formats. Prefer keeping these inside ignored
+# source-material directories rather than publishing them directly.
+source-materials/**/*.pdf
+course-materials/**/*.pdf
+lms/**/*.pdf
+slides/**/*.pdf
+handouts/**/*.pdf
+*.key
+*.ppt
+*.pptx
+*.doc
+*.docx

@@ -25,8 +25,8 @@
       "note-ids": [
         "demo-layered-recall",
         "demo-course-lecture-01",
-        "demo-course-syllabus",
-        "demo-course-overview"
+        "demo-course-overview",
+        "demo-course-syllabus"
       ]
     }
   },
@@ -51,7 +51,7 @@
       "status": "learning",
       "last-reviewed": "2026-07-01",
       "review-after": "2026-07-08",
-      "source": "Synthetic framework example written for this repository",
+      "source": "Synthetic example written for this repository",
       "visibility": "public-original",
       "source-risk": "original",
       "mistake-count": 0,
@@ -93,7 +93,7 @@
       "status": "reference",
       "last-reviewed": "",
       "review-after": "",
-      "source": "Synthetic framework example written for this repository",
+      "source": "Synthetic example written for this repository",
       "visibility": "public-framework",
       "source-risk": "original",
       "mistake-count": 0,
@@ -118,53 +118,9 @@
       ]
     },
     {
-      "id": "demo-course-syllabus",
-      "file": "courses/demo-course/syllabus.md",
-      "title": "Synthetic Demo Syllabus",
-      "course": "demo-course",
-      "type": "reference",
-      "topic": "syllabus",
-      "aliases": [
-        "demo syllabus"
-      ],
-      "prerequisites": [],
-      "related": [
-        "demo-layered-recall"
-      ],
-      "exam-weight": "none",
-      "status": "reference",
-      "last-reviewed": "",
-      "review-after": "",
-      "source": "Synthetic framework example written for this repository",
-      "visibility": "public-framework",
-      "source-risk": "original",
-      "mistake-count": 0,
-      "recent-mistakes-30d": 0,
-      "latest-mistake": "",
-      "mistake-tags": [],
-      "has-worked-example": false,
-      "has-practice-questions": false,
-      "practice-questions": {
-        "easy": 0,
-        "medium": 0,
-        "exam-style": 0,
-        "total": 0
-      },
-      "summary": "This is fictional framework data, not an official syllabus or summary of a real course.",
-      "headings": [
-        "Official Learning Outcomes",
-        "Weekly Topics",
-        "Assessment Topics",
-        "Exam-Relevant Sections",
-        "Excluded Topics",
-        "Lecturer Hints",
-        "Source Links or References"
-      ]
-    },
-    {
       "id": "demo-course-overview",
       "file": "courses/demo-course/course.md",
-      "title": "Synthetic Study Framework Demo",
+      "title": "Course Notes Demo",
       "course": "demo-course",
       "type": "reference",
       "topic": "course-overview",
@@ -179,7 +135,7 @@
       "status": "reference",
       "last-reviewed": "",
       "review-after": "",
-      "source": "Synthetic framework example written for this repository",
+      "source": "Synthetic example written for this repository",
       "visibility": "public-framework",
       "source-risk": "original",
       "mistake-count": 0,
@@ -200,6 +156,50 @@
         "Purpose",
         "Current Weak Areas",
         "Current Priorities"
+      ]
+    },
+    {
+      "id": "demo-course-syllabus",
+      "file": "courses/demo-course/syllabus.md",
+      "title": "Synthetic Demo Syllabus",
+      "course": "demo-course",
+      "type": "reference",
+      "topic": "syllabus",
+      "aliases": [
+        "demo syllabus"
+      ],
+      "prerequisites": [],
+      "related": [
+        "demo-layered-recall"
+      ],
+      "exam-weight": "none",
+      "status": "reference",
+      "last-reviewed": "",
+      "review-after": "",
+      "source": "Synthetic example written for this repository",
+      "visibility": "public-framework",
+      "source-risk": "original",
+      "mistake-count": 0,
+      "recent-mistakes-30d": 0,
+      "latest-mistake": "",
+      "mistake-tags": [],
+      "has-worked-example": false,
+      "has-practice-questions": false,
+      "practice-questions": {
+        "easy": 0,
+        "medium": 0,
+        "exam-style": 0,
+        "total": 0
+      },
+      "summary": "This is fictional demo data, not an official syllabus or summary of a real course.",
+      "headings": [
+        "Official Learning Outcomes",
+        "Weekly Topics",
+        "Assessment Topics",
+        "Exam-Relevant Sections",
+        "Excluded Topics",
+        "Lecturer Hints",
+        "Source Links or References"
       ]
     }
   ]

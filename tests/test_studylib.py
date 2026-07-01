@@ -355,7 +355,7 @@ class StudyLibTests(unittest.TestCase):
             self.assertTrue(any("suspicious term" in issue.message for issue in issues), f"term '{term}' not caught")
 
     def test_public_release_allows_clean_source_in_public_note(self):
-        text = VALID_TEXT.replace("source: \"Test fixture\"", "source: \"Synthetic framework example\"")
+        text = VALID_TEXT.replace("source: \"Test fixture\"", "source: \"Synthetic example\"")
         issues = validate_repository([make_note(text)], public_release=True)
         self.assertFalse(any("suspicious term" in issue.message for issue in issues))
 

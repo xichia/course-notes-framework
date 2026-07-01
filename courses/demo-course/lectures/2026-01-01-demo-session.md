@@ -11,7 +11,7 @@ exam-weight: none
 status: reference
 last-reviewed:
 review-after:
-source: "Synthetic framework example written for this repository"
+source: "Synthetic example written for this repository"
 visibility: public-framework
 source-risk: original
 ---
@@ -38,4 +38,4 @@ _None. This file demonstrates the raw-lecture location and metadata shape only._
 
 ## Source References
 
-- Synthetic framework example; no external course source.
+- Synthetic example; no external course source.
