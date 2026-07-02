@@ -57,6 +57,7 @@ FRAMEWORK_EXACT: tuple[str, ...] = (
     "build_review_queue.py",
     "check_public_safety.py",
     "mark_reviewed.py",
+    "scripts/pre-commit",
     "validate_notes.py",
 )
 
