@@ -13,6 +13,9 @@ This directory contains the operational guides for the course-notes system. Cour
 | [Repository layout](repository-layout.md) | One-folder workflow: tracked `courses/` plus the Git-ignored `private/` directory |
 | [Operating checklist](operating-checklist.md) | Quick reference for the daily study and pre-commit workflow |
 | [Public release checklist](public-release-checklist.md) | Manually sanitizing and reviewing material before it enters `courses/` |
+| [Study-layer workflow](study-layer-workflow.md) | Generating one source-linked study module from a curated private source pack |
+| [Study-module contract](study-module-contract.md) | Understanding the five-file study-module schema and its stable-ID rules |
+| [Study-layer validation](study-layer-validation.md) | Understanding mechanical vs. subject-matter validation for a study module |
 
 ## Templates
 

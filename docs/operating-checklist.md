@@ -1,111 +1,157 @@
 # Operating Checklist
 
-Quick reference for the one-folder Course Notes workflow.  See
-[repository-layout.md](repository-layout.md) for the full directory map and
-[publication-policy.md](publication-policy.md) for the metadata rules.
+Quick reference for the one-working-copy Course Notes workflow.
+
+See:
+
+- [Repository layout](repository-layout.md) for the directory model;
+- [Publication policy](publication-policy.md) for classification rules;
+- [Public-release checklist](public-release-checklist.md) before promoting private material.
 
 ---
 
-## 1. Daily / private study
+## 1. Private schema-based notes
 
-Study your private notes under `private/courses/`, review them, and keep the
-private generated views up to date:
+Private Markdown notes following the normal note schema may live under `private/courses/`.
+
+Validate them and rebuild their generated views with:
 
 ```bash
 make study-all
 ```
 
-This validates the private notes, rebuilds `private/manifest.json`, and
-regenerates `private/REVIEW_QUEUE.md`.
+This runs the private-note equivalents of validation, manifest generation, and review-queue generation.
+
+`make study-all` is for schema-based private notes. It is not a general validator for raw source packs, LMS imports, attachments, or five-file study-layer modules. Those artifacts use their own documented workflows and validators.
 
 ---
 
-## 2. Public framework / public notes
+## 2. Public notes and framework changes
 
-Before any public commit, make sure the tracked `courses/` tree and framework
-files are consistent:
+For tracked notes and framework files, run:
 
 ```bash
 make all
 ```
 
-This validates public notes, rebuilds `manifest.json`, regenerates
-`REVIEW_QUEUE.md`, and runs all tests.
+This:
+
+1. validates public notes;
+2. rebuilds `manifest.json`;
+3. rebuilds `REVIEW_QUEUE.md`;
+4. runs the regression suite.
+
+Generated files should be rebuilt through supported commands, not edited manually.
 
 ---
 
-## 3. Safety gate
+## 3. Canonical safety gate
 
-The hardening gate checks that no private material has leaked into the public
-surface:
+Before a public commit or push, run:
 
 ```bash
 make public-safety
 ```
 
-It verifies:
+The gate verifies that:
 
-- No files under `private/` are tracked by Git.
-- No files under `private/` are staged.
-- No public notes or generated files contain `private/` path references.
-- The public release gate (`validate_notes.py --public-release`) passes.
-- All tests pass.
+- nothing under `private/` is tracked;
+- nothing under `private/` is staged;
+- relevant tracked and staged public text does not contain configured leak patterns;
+- public-release validation passes;
+- all tests pass.
+
+The gate checks both staged and working-tree content where necessary, so a staged leak cannot be hidden by a later working-tree edit.
+
+This is moderate accidental-publication protection. It does not establish copyright clearance, confidentiality clearance, institutional permission, or legal authority to publish.
 
 ---
 
-## 4. Before every public commit or push
+## 4. Before a public commit
 
-Run the full pre-flight sequence:
+A useful pre-commit sequence is:
 
 ```bash
-make all                          # public consistency check
-make study-all                    # private consistency (optional but recommended)
-make public-safety                # leak barrier
-git status --short                # confirm only intended files are staged
-git ls-files private              # must return nothing
-git diff --cached --name-only -- private/   # must return nothing
+make all
+make public-safety
+git diff --check
+git status --short
+git diff --cached --name-status
+git ls-files -- private/
+git diff --cached --name-only -- private/
 ```
 
-If any command fails or reveals unexpected files, stop and investigate before
-committing.
+The final two commands must return no private paths.
+
+`make study-all` may also be useful when schema-based private notes changed, but it is not required for unrelated public framework work.
+
+Stop if:
+
+- a command fails;
+- an unexpected path is staged;
+- a generated file changes unexpectedly;
+- a private path appears;
+- the diff contains material you have not reviewed.
 
 ---
 
-## 5. Promoting a private note to public
+## 5. Before a push
 
-A note under `private/courses/<course>/` may be promoted to
-`courses/<course>/` only after sanitization.  The promoted note must use
-public-safe metadata:
+Before pushing:
+
+```bash
+make public-safety
+git status --branch --short
+git log --oneline --decorate -3
+```
+
+Confirm that:
+
+- the intended commits are present;
+- the working tree is clean or contains only understood changes;
+- the branch and remote are correct;
+- no private file is tracked or staged.
+
+Remote CI can ratify the pushed state only after the push occurs.
+
+---
+
+## 6. Promoting a private note
+
+Unsanitized or uncleared material must remain under `private/`.
+
+A derivative may be copied or rewritten into tracked `courses/` only after a separate sanitization and review process.
+
+Allowed public metadata includes:
 
 ```yaml
 visibility: public-original
 source-risk: original
 ```
 
-Or, if the source has a documented open licence:
+or, when the source has a documented compatible licence:
 
 ```yaml
 visibility: public-open-licensed
 source-risk: open-licensed
 ```
 
-After promoting a note, run:
+Do not change metadata merely to make validation pass. The content itself must support the classification.
+
+After promotion:
 
 ```bash
 make all
 make public-safety
 ```
 
-See [publication-policy.md](publication-policy.md) and
-[public-release-checklist.md](public-release-checklist.md) before promoting any
-material.
+Then complete the [Public-release checklist](public-release-checklist.md).
 
 ---
 
-## 6. Private material — allowed paths
+## 7. Private workspace
 
-The following paths are Git-ignored.  Keep all raw, source-risky, or
-unpublished material here:
+Common ignored locations include:
 
 ```text
 private/courses/
@@ -116,39 +162,71 @@ private/REVIEW_QUEUE.md
 private/framework-feedback.md
 ```
 
-Never commit or force-add anything under `private/`.  If `git status` ever
-shows a file under `private/`, investigate and unstage or untrack it
-immediately.
+Other workflow-specific private directories may also exist.
+
+Never use `git add -f` to force private material into Git.
+
+If a private path appears in `git status`, determine whether it is genuinely ignored, staged, or tracked before taking action.
+
+Useful checks:
+
+```bash
+git check-ignore -v private/
+git status --short --ignored
+git ls-files -- private/
+git diff --cached --name-only -- private/
+```
+
+Private material is deliberately absent from Git history and therefore needs an independent backup strategy.
 
 ---
 
-## 7. What to do when something leaks
+## 8. Responding to a safety failure
 
-If `make public-safety` fails:
+Read the complete diagnostic before changing anything.
 
-1. Read the error message — it names the file and the problem.
-2. If a `private/` file is **tracked**, remove it from Git:
+### Tracked private file
 
-   ```bash
-   git rm --cached <file>
-   ```
+Remove it from Git’s index without deleting the working copy:
 
-3. If a `private/` file is **staged**, unstage it:
+```bash
+git rm --cached -- <file>
+```
 
-   ```bash
-   git restore --staged <file>
-   ```
+### Staged private file
 
-4. If a public file references `private/`, edit the file to remove the leak.
-5. Re-run `make public-safety` to confirm the fix.
+Unstage it without discarding the working copy:
+
+```bash
+git restore --staged -- <file>
+```
+
+### Leak in a public file
+
+Remove or replace the sensitive reference, then rerun:
+
+```bash
+make public-safety
+```
+
+Do not weaken a legitimate check merely to obtain a passing result.
 
 ---
 
-## 8. Optional pre-commit hook (local only)
+## 9. Optional local hooks
 
-The repo provides an optional local pre-commit hook that runs
-`make public-safety` before every commit.  It is **not installed by default**
-and is entirely opt-in.
+The repository provides two optional managed hooks:
+
+```text
+scripts/pre-commit
+scripts/pre-push
+```
+
+Both run the canonical:
+
+```bash
+make public-safety
+```
 
 ### Install
 
@@ -156,9 +234,20 @@ and is entirely opt-in.
 make install-hooks
 ```
 
-This copies `scripts/pre-commit` to `.git/hooks/pre-commit` and makes it
-executable.  The hook runs only on your local machine; it is not committed
-or shared.
+This manages:
+
+```text
+.git/hooks/pre-commit
+.git/hooks/pre-push
+```
+
+Installation is safe and idempotent:
+
+- an already matching Course Notes hook is left in place;
+- an unrelated existing hook is not overwritten;
+- a conflict produces a diagnostic instead.
+
+Hooks are local to the working copy. Installing them does not commit them to another user’s `.git/hooks/` directory.
 
 ### Uninstall
 
@@ -166,29 +255,105 @@ or shared.
 make uninstall-hooks
 ```
 
-Removes `.git/hooks/pre-commit` only if it matches the Course Notes hook.
-If you have replaced it with a custom hook, the target will warn and leave
-it untouched.
+Removal is ownership-aware:
+
+- a byte-identical Course Notes hook is removed;
+- an unrelated or manually modified hook is left untouched;
+- missing hooks are a safe no-op.
 
 ### Bypass
 
-When you deliberately need to commit despite a failing gate:
+Either hook can be deliberately bypassed:
 
 ```bash
 git commit --no-verify
+git push --no-verify
 ```
 
-Reserve this for genuine emergencies or temporary experiments.  If the
-gate is blocking you in normal work, fix the underlying issue rather than
-routinely bypassing the hook.
+Bypass only when the consequences are understood. A routine failure should be corrected rather than habitually bypassed.
 
-### How it works
+### Limits
 
-The hook `cd`s to the repository root and runs:
+Hooks are:
+
+- optional;
+- local;
+- bypassable;
+- not a substitute for reviewing the staged diff;
+- not proof that content is authorised for publication.
+
+The pre-push hook runs before data leaves the local repository, but GitHub Actions remains the remote source of post-push ratification.
+
+---
+
+## 10. CI and generated-file freshness
+
+CI runs on pushes and pull requests.
+
+It:
+
+1. runs the canonical public-safety gate;
+2. rebuilds public generated files;
+3. checks that the committed generated files were current.
+
+A local passing result does not mean CI has already passed. After pushing, inspect the remote workflow before describing the release as green.
+
+---
+
+## 11. Local release blocklist
+
+An optional `.public-release-blocklist` may contain additional terms that should fail public-release validation.
+
+Example:
+
+```text
+# Comments and blank lines are ignored.
+Example Institution
+example.internal
+COURSE-PLACEHOLDER
+```
+
+The file is:
+
+- local only;
+- ignored by Git;
+- case-insensitive;
+- a smoke alarm rather than semantic review.
+
+Do not commit it.
+
+---
+
+## 12. Minimal daily sequence
+
+For schema-based private-note study:
+
+```bash
+make study-review
+```
+
+For public-note maintenance:
+
+```bash
+make review
+```
+
+After editing tracked notes:
+
+```bash
+make all
+```
+
+Before committing or pushing:
 
 ```bash
 make public-safety
 ```
 
-It exits nonzero on failure, which prevents the commit.  Messages are
-prefixed with `pre-commit (Course Notes):` for clarity.
+When in doubt, stop and inspect:
+
+```bash
+git status --short
+git diff
+git diff --cached
+```

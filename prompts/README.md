@@ -19,6 +19,8 @@ Most prompts work with a private study repository. Some can also help prepare pu
 | [`sanitize-for-public-release.md`](sanitize-for-public-release.md) | Create a sanitized public-release candidate from a private notes repository | Yes — this is the sanitization workflow |
 | [`update-status.md`](update-status.md) | Decide whether a note's status should change based on evidence | No — works with private notes and mistakes |
 | [`weekly-review.md`](weekly-review.md) | Plan a week of review targeting weak topics and stale dates | No — works with private notes and mistakes |
+| [`generate-study-module.md`](generate-study-module.md) | Generate one bounded, source-linked study module from a curated private source pack | No — works with private course material |
+| [`generate-course-study-index.md`](generate-course-study-index.md) | Connect completed study modules into a course-level index and revision plan | No — works with private course material |
 
 ## Publication-Safety Reminder
 

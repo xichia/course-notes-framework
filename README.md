@@ -1,331 +1,340 @@
 # Course Notes
 
-A Markdown-first system for durable learning notes, selective LLM retrieval, review queues, and study workflows. Markdown files under `courses/` are the source of truth; the manifest and review queue are generated views.
+Course Notes is a Markdown-first system for building durable study notes, practising active recall, and directing review toward the topics that need it most.
 
-> One repository, one working copy. Tracked content (`courses/` plus the framework) is the public-safe surface pushed to the GitHub remote; raw or source-risky material lives under a Git-ignored `private/` directory and is never committed.
+The repository supports public and private work in one working copy:
+
+- tracked `courses/` is the public course-content surface;
+- ignored `private/` holds unsanitized source material, personal study work, curated source packs, and private study modules;
+- dependency-free Python tools validate notes and generate retrieval and review views.
+
+No database, server, or specific editor is required.
+
+> **Private by default**
 >
-> License: MIT. See [LICENSE](LICENSE). The scripts, templates, prompts, and documentation are MIT licensed. Real course-derived notes should not be published through this repository unless separately cleared.
+> Raw, personal, unsanitized, or uncleared course-derived material belongs under the Git-ignored `private/` directory. A derivative may enter tracked `courses/` only after a separate sanitization, classification, and human review process.
+>
+> Automated checks reduce accidental disclosure; they do not establish copyright clearance, institutional permission, or legal authority to publish.
 
-## Quickstart
+The framework code, templates, prompts, and documentation are licensed under the [MIT License](LICENSE). That licence does not extend to private or third-party course content added by a user.
 
-For a human overview, open [INDEX.md](INDEX.md). For an LLM session, provide [LLM_GUIDE.md](LLM_GUIDE.md) and [manifest.json](manifest.json) first. For today's study priorities, open [REVIEW_QUEUE.md](REVIEW_QUEUE.md).
-
-After adding or changing notes, run the normal workflow:
+## Quick start
 
 ```bash
+git clone <repository-url>
+cd course-notes
 make all
 ```
 
-This validates notes, rebuilds generated files, and runs tests.  For the
-complete one-folder workflow (including private-study commands and the
-pre-commit safety gate), see
-[docs/operating-checklist.md](docs/operating-checklist.md). If Make is unavailable, use the direct commands:
+`make all`:
+
+1. validates tracked notes;
+2. rebuilds `manifest.json`;
+3. rebuilds `REVIEW_QUEUE.md`;
+4. runs the test suite.
+
+The repository includes a fictional demo course, so the public workflow can be tried without adding private material.
+
+Useful starting points:
+
+- [`INDEX.md`](INDEX.md) — human navigation for the demo course
+- [`REVIEW_QUEUE.md`](REVIEW_QUEUE.md) — generated study priorities
+- [`LLM_GUIDE.md`](LLM_GUIDE.md) — repository-aware LLM protocol
+- [`docs/course-onboarding.md`](docs/course-onboarding.md) — adding a real course
+- [`docs/operating-checklist.md`](docs/operating-checklist.md) — daily commands and release checks
+
+Before committing or pushing public changes, run:
 
 ```bash
-python3 validate_notes.py
-python3 build_manifest.py
-python3 build_review_queue.py
-python3 -m unittest discover -s tests
+make public-safety
 ```
 
-Individual Make targets are also available:
+Make is optional. The underlying tools use Python 3 and the standard library.
+
+## Core workflows
+
+### Public notes
+
+Tracked `courses/` contains synthetic, original, openly licensed, or separately sanitized notes intended for the public repository.
+
+Public notes:
+
+- follow the [`TEMPLATE.md`](TEMPLATE.md) note contract;
+- use an allowed `visibility` and `source-risk` classification;
+- pass normal validation;
+- pass the stricter public-release checks before publication.
+
+The included `courses/demo-course/` tree is fictional and demonstrates the public format. It is not an onboarding destination for real course material.
+
+### Private notes and source material
+
+Unsanitized notes, raw source material, personal study evidence, and material whose publication status is unclear belong under ignored `private/` paths.
+
+Private Markdown notes that follow the normal note schema may mirror the tracked course layout and use:
 
 ```bash
-make validate
-make manifest
-make review
-make test
-make all
+make study-validate
+make study-manifest
+make study-review
+make study-all
 ```
 
-Make is only a convenience; the scripts require Python 3, use only the standard library, and remain directly runnable.
+These commands are for schema-based private notes. They are not general validators for every artifact under `private/`.
 
-## Public/private content policy
+Curated source packs, LMS imports, raw files, and other workflow-specific material may use different private structures. They remain ignored and should be handled by the workflow that created them.
 
-The publishable work in this repository is original study material, not reproduced lecture material. Both public and private material live in this **single** repository, separated by directory and Git tracking rather than by repository:
+### Study-layer modules
 
-| Public Course Notes material (tracked, pushed) | Private by default (`private/`, Git-ignored) |
-|---|---|
-| Templates, scripts, prompts, docs, metadata schemas, validation logic, generated-file conventions, and synthetic examples | Real lecture-derived notes, problem sheets, exam maps/questions, lecturer hints, LMS material, assessment material, personal study evidence, and course-specific examples |
+The study-layer workflow turns a curated private source pack into a bounded topic module containing:
 
-- **`courses/`** holds only public-safe, polished notes. It is tracked by Git and must pass `make validate-public`. This is the only course tree the GitHub remote ever sees.
-- **`private/`** holds everything source-risky or not yet cleared: private course notes under `private/courses/`, raw source material under `private/raw/`, drafts under `private/drafts/`, and `private/framework-feedback.md`. The whole `private/` tree is ignored by Git (see [.gitignore](.gitignore)) and is never committed or pushed. It stays local to your working copy.
+```text
+STUDY_GUIDE.md
+QUESTION_BANK.md
+ANSWER_KEY.md
+COVERAGE_MATRIX.md
+source-map.json
+```
 
-AI summarizing or paraphrasing alone does not make protected course material safe to publish. Keeping a file under `private/` is not sanitization; promoting a private note into `courses/` requires a separate sanitization and review step.
+Several validated modules can then be connected through a course-level study index, revision plans, and a source-issue register.
 
-Read [docs/publication-policy.md](docs/publication-policy.md) before changing visibility or preparing a release, and use [docs/public-release-checklist.md](docs/public-release-checklist.md) before promoting any private note into `courses/`.
+The study-layer workflow normally remains private. Mechanical validation checks structure and provenance; separate subject-matter review checks reasoning, calculations, and teaching quality.
 
-`make validate-public` applies the same conservative gate as before: it scans only `courses/` and fails on `visibility: private`, course-derived or unknown `source-risk`, missing publication classifications, and local paths. The gate is not weakened by the `private/` directory — `private/` is simply outside its scan scope.
+Start with:
 
-### Public vs private notes
+- [Study-layer workflow](docs/study-layer-workflow.md)
+- [Study-module contract](docs/study-module-contract.md)
+- [Study-layer validation](docs/study-layer-validation.md)
+- [Generate one study module](prompts/generate-study-module.md)
+- [Generate a course-level study index](prompts/generate-course-study-index.md)
 
-This repository is both the study workspace and the public Course Notes release. Tooling, templates, prompts, documentation, validation logic, and synthetic/demo content are tracked; real course notes and raw source material are kept under the Git-ignored `private/` directory.
+### Promoting material to the public tree
 
-A note is private by default (`visibility: private`) and its first or working copy belongs under `private/courses/`. It may intentionally fail `make validate-public`, because that gate only ever runs against `courses/`. A note may move into `courses/` only after it has been sanitized to `public-framework` / `public-original` / `public-open-licensed` with an allowed `source-risk` and has passed `make public-safety`.
+Keeping a file under `private/` is not sanitization.
 
-## Repository Structure
+A derivative may be promoted into tracked `courses/` only when it has been:
+
+1. rewritten or transformed into an appropriate public artifact;
+2. stripped of private, identifying, restricted, or institution-specific material;
+3. assigned an allowed publication classification;
+4. manually reviewed against the publication policy and release checklist;
+5. validated by the public safety gate.
+
+Required references:
+
+- [docs/publication-policy.md](docs/publication-policy.md)
+- [docs/public-release-checklist.md](docs/public-release-checklist.md)
+- [Sanitize for public release prompt](prompts/sanitize-for-public-release.md)
+
+## What the framework provides
+
+- **Structured Markdown notes** with stable IDs, relationships, review metadata, practice questions, and mistake evidence.
+- **Validation** for metadata, links, IDs, dates, note structure, publication classifications, and local-path portability.
+- **Generated views** through `manifest.json` and `REVIEW_QUEUE.md`.
+- **Review tooling** for updating review dates after active recall.
+- **Manifest-first LLM use** so an executor can select relevant notes before opening full files.
+- **Reusable prompts** for importing, explaining, quizzing, revising, sanitizing, and generating private study modules.
+- **Publication-safety tooling** shared by manual commands, optional local hooks, and CI.
+- **A dependency-free test suite** using Python’s standard library.
+
+## Repository map
 
 ```text
 course-notes/
-├── courses/                        tracked, public-safe polished notes only
-│   └── <course-code>/
-│       ├── course.md          course metadata, resources, and priorities
-│       ├── syllabus.md        official outcomes and confirmed coverage
-│       ├── concepts/          durable, one-concept-per-file notes
-│       ├── lectures/          chronological lecture records
-│       ├── problem-sheets/    attempts, corrections, and reflections
-│       ├── exam/              exam maps and revision summaries
-│       └── glossary.md        course terminology
-├── private/                        Git-ignored; never committed or pushed
-│   ├── courses/               private/source-risky notes (mirror the courses/ layout)
-│   ├── raw/                   raw source material
-│   ├── drafts/                 work in progress
-│   └── framework-feedback.md  scratch notes about the framework itself
-├── docs/                           onboarding and friction-test checklists
-├── prompts/                        reusable LLM study workflows
-├── templates/                      course, syllabus, and raw lecture templates
-├── Makefile                        optional command shortcuts
-├── TEMPLATE.md                     canonical concept-note template
-├── LLM_GUIDE.md                    LLM navigation and editing protocol
-├── INDEX.md                        maintained human navigation
-├── manifest.json                   generated machine-readable index
-└── REVIEW_QUEUE.md                 generated ranked review list
+├── courses/          tracked public course notes and the fictional demo course
+├── private/          ignored local workspace for private notes and source material
+├── docs/             operating, onboarding, publication, and study-layer guides
+├── prompts/          reusable human and repository-executor workflows
+├── templates/        course, syllabus, lecture, and note templates
+├── scripts/          optional managed pre-commit and pre-push hooks
+├── tests/            regression tests
+├── handoffs/         dated historical implementation snapshots
+├── TEMPLATE.md       canonical concept-note structure
+├── LLM_GUIDE.md      retrieval and repository-editing protocol
+├── INDEX.md          maintained human navigation
+├── PROJECT_STATE.md  current operational state
+├── Makefile          command shortcuts
+├── manifest.json     generated retrieval index
+└── REVIEW_QUEUE.md   generated study-priority view
 ```
 
-The included `courses/demo-course/` tree is fictional and exists only to demonstrate the system; replace it with other synthetic material—not real course notes—when preparing a public variant. The `private/` directory is ignored by Git: it exists for your local working material and is not part of the public release.
+The root-level Python tools implement validation, generation, review updates, and publication checks. Shared note and validation logic lives in `studylib.py`.
 
-## Source of Truth and Generated Files
+`manifest.json` and `REVIEW_QUEUE.md` are generated files. Change source Markdown and rebuild them rather than editing them by hand.
 
-- Markdown under `courses/` is the source of truth for course knowledge, evidence, and review metadata.
-- `manifest.json` is a generated retrieval index. Its top-level `_generated` field says how to rebuild it.
-- `REVIEW_QUEUE.md` is a generated study-priority view and begins with a generated-file warning.
-- `INDEX.md` and course `README.md` files are maintained human navigation.
-- Files under `prompts/` are reusable instructions, not course facts.
-
-Never edit `manifest.json` or `REVIEW_QUEUE.md` manually. Update source Markdown and run `make manifest`, `make review`, or `make all`.
-
-**Determinism:** Generated files use a date-only `generated-at` field (no time). Running `make all` multiple times on the same day produces no diff when notes are unchanged. For fully reproducible builds, set the `SOURCE_DATE_EPOCH` environment variable (Unix timestamp) or pass `--today` to `build_review_queue.py`.
-
-## Command Reference
+## Common commands
 
 | Command | Purpose |
-|---|---|---|
-| `make validate` | Check metadata, IDs, dates, links, required sections, and mistake structure |
-| `make validate-public` | Apply the stricter public-release gate to `courses/` only; private notes under `private/` are outside its scope. Loads `.public-release-blocklist` if present (see below) |
+|---|---|
+| `make validate` | Validate tracked notes |
 | `make manifest` | Validate and rebuild `manifest.json` |
-| `make review` | Validate and rebuild `REVIEW_QUEUE.md` for today; set `DATE=YYYY-MM-DD` for a reproducible date |
-| `make test` | Run the dependency-free regression suite |
-| `make pre-release` | Convenience release rebuild: run `make public-safety`, then regenerate public generated files |
-| `make all` | Run normal validation, both generators, and all tests |
-| `make reviewed NOTE=layered-recall` | Update `last-reviewed` and `review-after` for a note by ID (see below) |
-| `make reviewed NOTE=layered-recall DATE=2026-07-15` | As above, using a specific review date |
-| `python3 build_review_queue.py --today YYYY-MM-DD` | Generate the review queue for a specific date |
-| `make study-validate` | Validate notes under `private/courses/` |
-| `make study-manifest` | Build `private/manifest.json` from study notes |
-| `make study-review` | Build `private/REVIEW_QUEUE.md` from study notes |
-| `make study-all` | Run study-validate, study-manifest, and study-review |
-| `make study-reviewed NOTE=<id>` | Mark a study note under `private/courses/` as reviewed |
-| `make public-safety` | Canonical publication-safety gate: check Git boundaries and tracked/staged leaks, validate the public tree, and run all tests |
+| `make review` | Validate and rebuild `REVIEW_QUEUE.md` |
+| `make test` | Run the complete regression suite |
+| `make all` | Validate, regenerate both public views, and run tests |
+| `make validate-public` | Apply publication classifications and public-release checks |
+| `make study-all` | Validate and regenerate views for schema-based private notes |
+| `make reviewed NOTE=<id>` | Update review dates after studying a public note |
+| `make study-reviewed NOTE=<id>` | Update review dates for a private schema-based note |
+| `make public-safety` | Run the canonical publication-safety gate |
+| `make install-hooks` | Install the managed pre-commit and pre-push hooks |
+| `make uninstall-hooks` | Remove only Course Notes-owned hooks |
+| `make pre-release` | Run the safety gate and regenerate public views |
 
-The equivalent direct Python commands are shown in Quickstart. Append `--study` to any tool to target `private/courses/` instead of `courses/`.
+For daily sequences, direct Python equivalents, reproducible dates, and hook behaviour, see the [Operating checklist](docs/operating-checklist.md).
 
-CI runs on every push and pull request: the canonical `make public-safety` gate, a rebuild of public generated files, and a generated-file staleness check. See [ci.yml](.github/workflows/ci.yml). Remote CI can ratify a change only after it is pushed.
+## Note contract
 
-### Optional blocklist
+Every study document under `courses/`, except navigational `README.md` files, uses constrained frontmatter.
 
-Create `.public-release-blocklist` in the repository root with one term per line to extend `make validate-public`. This local-only file is ignored by Git by default; do not commit it. Lines starting with `#` and blank lines are ignored. Matching is case-insensitive.
-
-```text
-# Lines starting with # are comments.
-Example University
-PROFESSOR NAME
-canvas.example.edu
-MATH123
-```
-
-When present, `make validate-public` scans all Markdown files for these terms and reports each match as an error. This is a safety smoke alarm — it does not replace manual review. Remove or replace any blocked terms before publishing.
-
-### Mark a note as reviewed
-
-After studying a note, update its review metadata with:
-
-```bash
-make reviewed NOTE=layered-recall
-```
-
-Or with a specific date:
-
-```bash
-make reviewed NOTE=layered-recall DATE=2026-07-15
-```
-
-The script updates only `last-reviewed` and `review-after`. It does not change `status`, `visibility`, `source-risk`, or any other frontmatter. The next review date is chosen from the current status:
-
-| Status | Next review |
+| Field | Purpose |
 |---|---|
-| `new` | +1 day |
-| `shaky` | +2 days |
-| `learning` | +7 days |
-| `solid` | +30 days |
-| `mastered` | +60 days |
-| `reference` / `archived` | blank |
-
-Run `make all` after the update to regenerate the manifest and review queue.
-
-## Adding a new course
-
-The full copy-and-check workflow is in [docs/course-onboarding.md](docs/course-onboarding.md). In short:
-
-1. Create `private/courses/<course-code>/` with `concepts/`, `lectures/`, `problem-sheets/`, and `exam/`.
-2. Copy `templates/course.md` to `private/courses/<course-code>/course.md` and replace every placeholder.
-3. Copy `templates/syllabus.md` to `private/courses/<course-code>/syllabus.md`; add only official or explicitly sourced material.
-4. Copy `templates/lecture.md` into `private/courses/<course-code>/lectures/` for each raw chronological lecture record.
-5. Use `prompts/import-lecture.md` to propose durable concept extraction, then create approved concepts from `TEMPLATE.md`.
-6. Put attempts, corrections, and evidenced mistakes under `private/courses/<course-code>/problem-sheets/`.
-7. Put confirmed exam information and outcome maps under `private/courses/<course-code>/exam/`.
-8. Run `make study-validate`.
-9. Run `make study-manifest`, `make study-review`, and `make test` (or `make study-all` followed by `make test`).
-
-`courses/` is not the onboarding destination for real material. Use it only when a sanitized public candidate is ready for the separate publication workflow.
-
-Set every document's `course` field to the exact directory name. Keep raw lecture notes intact, preserve source paths, and keep missing official information visibly unknown.
-
-After the first import, run the ten-minute [course import friction test](docs/friction-test.md).
-
-## Add a Concept Note
-
-1. Copy `TEMPLATE.md` to `private/courses/<course-code>/concepts/readable-filename.md`.
-2. Give it a repository-unique, permanent `id`. For new notes, `<course-code>-<concept-slug>` is a useful convention.
-3. Fill in every metadata field and write the note in your own words.
-4. Use note IDs, not filenames, in `prerequisites` and `related`.
-5. Validate, then regenerate the manifest and review queue.
-
-Keep filenames readable and stable. A concept note should grow as understanding improves instead of being replaced by dated copies.
-
-## Daily Study
-
-1. Run `make review` (or `python3 build_review_queue.py`).
-2. Open `REVIEW_QUEUE.md`, or give `prompts/daily-study.md` to an LLM with repository access.
-3. Study the highest-priority item through active recall before rereading it.
-4. Update review dates and Mistake Log items only after checking your performance. Use `make reviewed NOTE=<id>` to update dates quickly.
-5. Run `make all` after changing source notes.
-
-For a weekly planning session, run `make all`, then use `prompts/weekly-review.md` with the refreshed manifest and queue.
-
-## Metadata Contract
-
-Every study document under `courses/` (except navigational `README.md` files) uses the same frontmatter keys:
-
-| Field | Meaning |
-|---|---|
-| `id` | Permanent, repository-unique identifier; lowercase letters, numbers, dots, and hyphens |
-| `title` | Human title, matching the document's `#` heading |
-| `course` | Course directory name |
-| `type` | `concept`, `lecture`, `problem-sheet`, `exam-map`, `glossary`, or `reference` |
-| `topic` | Stable topic slug within the course |
-| `aliases` | Alternative search terms as an inline list |
-| `prerequisites` | Note IDs needed first |
+| `id` | Permanent repository-unique identifier |
+| `title` | Human title matching the document heading |
+| `course` | Exact course directory name |
+| `type` | Document type such as concept, lecture, problem sheet, exam map, glossary, or reference |
+| `topic` | Stable topic slug |
+| `aliases` | Alternative retrieval terms |
+| `prerequisites` | IDs that should be understood first |
 | `related` | Other relevant note IDs |
 | `exam-weight` | `none`, `low`, `medium`, or `high` |
-| `status` | `new`, `learning`, `shaky`, `solid`, `mastered`, `reference`, or `archived` |
-| `last-reviewed` | Last active-recall date as `YYYY-MM-DD`, or blank |
-| `review-after` | Next review date as `YYYY-MM-DD`, or blank |
-| `source` | Lecture, text, problem sheet, URL, or an honest note that the source is unknown |
-| `visibility` | Optional publication classification: `private`, `public-framework`, `public-original`, or `public-open-licensed` |
-| `source-risk` | Optional provenance risk: `lecture-derived`, `problem-sheet-derived`, `exam-derived`, `lms-derived`, `open-licensed`, `original`, or `unknown` |
+| `status` | Recall state: `new`, `learning`, `shaky`, `solid`, `mastered`, `reference`, or `archived` |
+| `last-reviewed` | Date of the latest active-recall review |
+| `review-after` | Earliest suggested next-review date |
+| `source` | Honest provenance description |
+| `visibility` | Private or allowed public classification |
+| `source-risk` | Provenance-risk classification |
 
-Lists use the simple inline form `[first-id, second-id]`. This constrained frontmatter format keeps the scripts dependency-free and the files easy to inspect.
+Inline lists use the form:
 
-## Status and Review Workflow
-
-Use status as a judgment about recall, not note polish:
-
-- `new`: captured but not learned
-- `learning`: partly understood; cannot yet reproduce reliably
-- `shaky`: previously learned but errors or gaps remain
-- `solid`: can explain and solve representative problems
-- `mastered`: reliable after repeated delayed review
-- `reference`: useful navigation material, not a review item
-- `archived`: retained but excluded from active review
-
-After an active review:
-
-1. Update `last-reviewed`.
-2. Set `review-after` to the next useful date. A practical starting cadence is 1–3 days for `new`/`shaky`, 7–14 days for `learning`, 30 days for `solid`, and 60–90 days for `mastered`.
-3. Propose a `status` change separately from making it. Upgrade only after repeated recall or application evidence; downgrade when repeated mistakes demonstrate a real gap.
-4. Record any evidenced error with the structured Mistake Log convention below.
-5. Regenerate `manifest.json` and `REVIEW_QUEUE.md`.
-
-Use `prompts/update-status.md` after a quiz, problem sheet, or timed recall session. One good answer, confidence alone, or improved prose is not enough to upgrade status. A useful upgrade normally needs successful evidence from at least two attempts separated by time or using different task types.
-
-## Recording Mistakes
-
-Mistakes are immutable evidence, not a to-do list. Add one five-field block under `## Mistake Log` only when an actual quiz, problem sheet, exam, or recall attempt exposed the error:
-
-```md
-- date: 2026-06-30
-  source: problem-sheet-01
-  mistake: Describe what went wrong.
-  correction: Record the action or idea to apply next time.
-  tags: [exam-trap, procedure]
+```yaml
+related: [first-id, second-id]
 ```
 
-Use one line per field and inline slug-style tags. `date: unknown` is allowed only when migrating a genuine older mistake whose date was never recorded. Do not delete old entries when they improve; their recent-priority effect expires automatically after 30 days, while the history remains useful.
+`TEMPLATE.md` is the canonical concept-note structure. `LLM_GUIDE.md` explains how executors should interpret and edit it.
 
-## Practice Questions
+## Review model
 
-Every concept note has `## Practice Questions` with `### Easy`, `### Medium`, and `### Exam-style` groups. Questions are ordinary Markdown bullets. Empty groups use `_No practice questions recorded yet._`; never create filler questions merely to satisfy validation.
+Status describes recall and application, not how polished a note looks.
 
-The manifest records counts by difficulty plus `has-practice-questions`. It also records whether the note has a substantive worked example, allowing weekly review to expose thin notes.
+A review should involve active recall or problem solving before rereading. After reviewing:
 
-## Review Priority
+1. record genuine mistakes as evidence;
+2. update `last-reviewed` and `review-after`;
+3. propose status changes separately;
+4. regenerate the manifest and review queue.
 
-The generated queue documents the same additive formula beside its results:
+Use:
 
-- status: shaky +40, new +32, learning +26, solid +8, mastered +0;
-- exam weight: high +25, medium +14, low +5, none +0;
-- review timing: +30 when due, plus up to +30 for overdue days; missing `review-after` +10;
-- review age: never reviewed +20, otherwise up to +20 after the first seven days;
-- mistakes: +5 each up to +20, plus +12 for each dated mistake in the last 30 days up to +36;
-- missing practice questions on a concept: +10;
-- high exam weight combined with shaky status: +15.
+```bash
+make reviewed NOTE=<id>
+```
 
-The score ranks attention; it is not a grade or automatic status decision. Use `python3 build_review_queue.py --today YYYY-MM-DD` for a reproducible queue on a specified date.
+or, for a reproducible date:
 
-## Manifest-First LLM Use
+```bash
+make reviewed NOTE=<id> DATE=YYYY-MM-DD
+```
 
-`manifest.json` contains metadata, publication classifications, short summaries, headings, mistake counts/dates/tags, worked-example coverage, and practice-question counts for every study document. An LLM should:
+A status upgrade should normally be supported by repeated evidence separated by time or task type. Confidence, one correct response, or improved prose alone is not sufficient.
 
-1. Read the manifest first.
-2. Filter to relevant course, topic, type, status, aliases, or exam weight.
-3. Open only the selected files listed in `file`.
-4. Follow prerequisite and related IDs only when needed.
-5. Treat the Markdown notes as authoritative and generated files as disposable indexes.
+Concept notes include:
 
-See [LLM_GUIDE.md](LLM_GUIDE.md) for the full protocol and [prompts/README.md](prompts/README.md) for ready-to-use study workflows.
+- a worked example where appropriate;
+- practice questions at easy, medium, and exam-style levels;
+- a structured Mistake Log for errors actually observed during study.
 
-## LLM Workflow Reference
+The generated review queue combines status, exam weight, review timing, review age, recent mistakes, and missing practice into a prioritization score. The score directs attention; it is not a grade or an automatic status decision.
 
-| Workflow | Prompt |
+## Manifest-first LLM use
+
+An executor should normally:
+
+1. read `manifest.json`;
+2. filter by course, topic, type, status, alias, or exam weight;
+3. open only selected source Markdown files;
+4. follow prerequisite or related IDs only when necessary;
+5. treat source Markdown as authoritative and generated views as disposable indexes.
+
+See [`LLM_GUIDE.md`](LLM_GUIDE.md) and the [Prompt index](prompts/README.md).
+
+## Publication safety
+
+`make public-safety` is the canonical local gate. It:
+
+1. rejects tracked files under `private/`;
+2. rejects staged changes under `private/`;
+3. scans relevant working-tree and staged public text for configured leak patterns;
+4. runs `validate_notes.py --public-release`;
+5. runs the complete test suite.
+
+The repository also provides optional managed hooks:
+
+- `pre-commit` runs the gate before a commit;
+- `pre-push` runs the gate before a push.
+
+Install or remove them with:
+
+```bash
+make install-hooks
+make uninstall-hooks
+```
+
+Installation refuses to overwrite unrelated hooks. Removal deletes only byte-identical hooks owned by this project.
+
+Both hooks are local, optional, and bypassable:
+
+```bash
+git commit --no-verify
+git push --no-verify
+```
+
+CI runs the same canonical gate after a push or on a pull request and separately checks that generated public files are current. A green local result is not a claim that remote CI has passed; CI is post-push ratification.
+
+The checks are deliberately conservative but still limited. They do not understand copyright, confidentiality, institutional policy, or every possible form of sensitive content. Human review remains the publication authority.
+
+An optional local `.public-release-blocklist` can add repository-specific smoke-test terms. It is ignored by Git and should not be committed.
+
+## Documentation by task
+
+| Goal | Start here |
 |---|---|
-| Import a rough lecture safely | [prompts/import-lecture.md](prompts/import-lecture.md) |
-| Run today's study session | [prompts/daily-study.md](prompts/daily-study.md) |
-| Quiz one topic interactively | [prompts/quiz-me.md](prompts/quiz-me.md) |
-| Explain a selected concept | [prompts/explain-a-concept.md](prompts/explain-a-concept.md) |
-| Improve or extract a durable note | [prompts/improve-this-note.md](prompts/improve-this-note.md) |
-| Generate source-backed flashcards | [prompts/generate-flashcards.md](prompts/generate-flashcards.md) |
-| Prepare for an exam | [prompts/prepare-for-an-exam.md](prompts/prepare-for-an-exam.md) |
-| Plan the next week | [prompts/weekly-review.md](prompts/weekly-review.md) |
-| Evaluate a status change from evidence | [prompts/update-status.md](prompts/update-status.md) |
+| Understand the repository layout | [Repository layout](docs/repository-layout.md) |
+| Add a real course | [Course onboarding](docs/course-onboarding.md) |
+| Run daily and pre-release commands | [Operating checklist](docs/operating-checklist.md) |
+| Decide what may be published | [Publication policy](docs/publication-policy.md) |
+| Review a release candidate | [Public-release checklist](docs/public-release-checklist.md) |
+| Generate a private study module | [Study-layer workflow](docs/study-layer-workflow.md) |
+| Understand the module files and stable IDs | [Study-module contract](docs/study-module-contract.md) |
+| Validate generated study material | [Study-layer validation](docs/study-layer-validation.md) |
+| Give an executor repository instructions | [LLM guide](LLM_GUIDE.md) |
+| Browse reusable prompts | [Prompt index](prompts/README.md) |
+| Check the current operational state | [Project state](PROJECT_STATE.md) |
+| Review historical implementation context | [Handoffs](handoffs/) |
 
-Every workflow must distinguish repository evidence from external explanation, preserve uncertainty, and avoid inventing course content.
+## Development
 
-## Validation and Generated Files
+Keep changes scoped and review the actual diff before committing.
 
-`validate_notes.py` catches missing fields, malformed dates/lists, malformed structured mistakes, invalid status/weight/visibility/source-risk values, duplicate IDs, broken ID and Markdown links, absolute machine-specific links anywhere in repository Markdown, type/course-directory mismatches, title mismatches, and missing concept sections such as Practice Questions. Errors name the affected file and field or section, show the bad value when useful, and suggest a repair. The command exits non-zero on errors.
+For normal public changes:
 
-`python3 validate_notes.py --public-release` (or `make validate-public`) is the validation component of the canonical `make public-safety` gate. It fails on private visibility, course-derived or unknown source risk, missing publication classifications, and local paths. Do not weaken this check to make a real private repository pass.
+```bash
+make all
+make public-safety
+git diff --check
+git status --short
+```
 
-`build_manifest.py` and `build_review_queue.py` validate before writing. They will not replace their outputs when notes are malformed. `manifest.json` carries a top-level `_generated` warning; `REVIEW_QUEUE.md` begins with a generated-file HTML comment. Never edit either file manually: change the source Markdown and rebuild it.
+Automated checks are necessary, not sufficient. Contributors remain responsible for verifying that a change is correct, appropriately sourced, and suitable for the public repository.
 
-For documentation navigation and repository-maintenance checks, see [docs/README.md](docs/README.md).
+## Scope and limitations
+
+Course Notes is not:
+
+- a full LMS mirror;
+- an automatic importer for every source system;
+- an automatic publishing or clearance system;
+- a backup system for ignored private files;
+- proof that course-derived material may be redistributed;
+- a guarantee that generated explanations, calculations, or study questions are correct;
+- a replacement for human review.
+
+It is a practical framework for keeping study knowledge inspectable, reviewable, source-aware, and separated from material that should remain private.
