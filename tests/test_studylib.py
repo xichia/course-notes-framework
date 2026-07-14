@@ -1,4 +1,5 @@
 import json
+import subprocess
 import tempfile
 import unittest
 from datetime import date, timedelta
@@ -425,6 +426,14 @@ class StudyLibTests(unittest.TestCase):
 
     def test_blocklist_file_not_found_returns_empty(self):
         self.assertEqual([], load_blocklist(ROOT / "nonexistent-blocklist.file"))
+
+    def test_local_blocklist_is_ignored_by_git(self):
+        result = subprocess.run(
+            ["git", "check-ignore", "-q", ".public-release-blocklist"],
+            cwd=ROOT,
+            check=False,
+        )
+        self.assertEqual(0, result.returncode)
 
     def test_blocklist_comments_and_blanks_ignored(self):
         with tempfile.TemporaryDirectory() as td:

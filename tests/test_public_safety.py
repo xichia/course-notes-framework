@@ -106,6 +106,15 @@ class TestPublicSafety(unittest.TestCase):
         self.assertIn("FAILED: public non-framework files reference private/ paths", self.mock_stderr.getvalue())
         self.assertIn("courses/public.md:1", self.mock_stderr.getvalue())
 
+    def test_unrecognised_root_file_with_private_reference_fails(self):
+        self._add_file("STATUS.md", "See private/notes.md")
+        self._git_add("STATUS.md")
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        self.assertIn("FAILED: public non-framework files reference private/ paths", self.mock_stderr.getvalue())
+        self.assertIn("STATUS.md:1", self.mock_stderr.getvalue())
+
     def test_private_courses_reference_in_public_content(self):
         self._add_file("courses/public.md", "Check out private/courses/notes.md")
         self._git_add("courses/public.md")
@@ -119,11 +128,11 @@ class TestPublicSafety(unittest.TestCase):
         # 1. In content
         self._add_file("courses/public.md", "My path is /Users/ianchia/stuff")
         self._git_add("courses/public.md")
-        
+
         # 2. In framework file
         self._add_file("Makefile", "Local dev file://foo")
         self._git_add("Makefile")
-        
+
         ret = main()
         self.assertEqual(ret, 1)
         stderr = self.mock_stderr.getvalue()
@@ -132,6 +141,165 @@ class TestPublicSafety(unittest.TestCase):
         self.assertIn("file://", stderr)
         # Should not fail on private reference because these are just absolute paths
         self.assertNotIn("FAILED: public non-framework files reference private/ paths", stderr)
+
+    def test_absolute_paths_blocked_for_any_username_not_just_configured_one(self):
+        # The detector must not be hardcoded to one specific local username —
+        # any /Users/<name>, /home/<name>, or Windows drive-letter path is a leak.
+        self._add_file("courses/a.md", "See /Users/someoneelse/notes for details")
+        self._add_file("courses/b.md", "See /home/otherperson/notes for details")
+        self._add_file("courses/c.md", r"See C:\Users\someone\Documents for details")
+        for f in ("courses/a.md", "courses/b.md", "courses/c.md"):
+            self._git_add(f)
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        stderr = self.mock_stderr.getvalue()
+        self.assertIn("FAILED: tracked/staged files contain absolute local paths", stderr)
+        self.assertIn("/Users/someoneelse", stderr)
+        self.assertIn("/home/otherperson", stderr)
+        self.assertIn(r"C:\Users\someone", stderr)
+
+    def test_specific_private_course_path_blocked_even_in_framework_file(self):
+        # Generic "private/" and "private/courses/" mentions are allowed in
+        # framework docs, but a path shaped like a real course directory
+        # (containing a digit, unlike the documented "course-code" placeholder)
+        # must still be caught, even inside an otherwise-exempt framework file.
+        self._add_file(
+            "docs/example.md",
+            "See private/courses/ABCD1234-2026-S1/materials/lecture.pdf for the leak.",
+        )
+        self._git_add("docs/example.md")
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        stderr = self.mock_stderr.getvalue()
+        self.assertIn("FAILED: tracked/staged files reference a specific private-course path", stderr)
+        self.assertIn("ABCD1234-2026-S1", stderr)
+
+    def test_generic_course_code_placeholder_in_framework_file_is_allowed(self):
+        # The documented placeholder shape ("course-code", no digits) must
+        # not be mistaken for a real leaked course path.
+        self._add_file(
+            "docs/example.md",
+            "mkdir -p private/courses/course-code/concepts",
+        )
+        self._git_add("docs/example.md")
+
+        ret = main()
+        self.assertEqual(ret, 0)
+        self.assertEqual(self.mock_stderr.getvalue(), "")
+
+    def test_private_file_staged_then_edited_in_working_tree_still_fails(self):
+        # A private/ file staged for addition, then further edited (but not
+        # unstaged) in the working tree, must still be caught by the
+        # staged-private-file check regardless of the working-tree content.
+        self._add_file("private/leak.txt", "secret v1")
+        self._git_add("private/leak.txt")
+        self._add_file("private/leak.txt", "secret v2, edited after staging")
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        self.assertIn("FAILED: staged changes would introduce private/ files", self.mock_stderr.getvalue())
+
+    def test_private_file_staged_then_deleted_in_working_tree_still_fails(self):
+        # A private/ file staged for addition, then deleted from the working
+        # tree without unstaging, must still be caught — the staged blob
+        # would still leak on commit.
+        self._add_file("private/leak.txt", "secret")
+        self._git_add("private/leak.txt")
+        (self.root / "private" / "leak.txt").unlink()
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        self.assertIn("FAILED: staged changes would introduce private/ files", self.mock_stderr.getvalue())
+
+    def test_working_tree_only_leak_is_caught_and_tagged(self):
+        # An uncommitted, unstaged working-tree edit that introduces a leak
+        # must be caught even though nothing was staged.
+        self._add_file("courses/public.md", "Reference to private/notes here")
+        self._git_add("courses/public.md")
+        self._git_commit()
+        # Now edit in the working tree only (not staged).
+        self._add_file("courses/public.md", "Reference to private/other-notes here")
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        self.assertIn("FAILED: public non-framework files reference private/ paths", self.mock_stderr.getvalue())
+
+    def test_checker_and_its_own_test_file_are_excluded_from_scanning(self):
+        # check_public_safety.py and tests/test_public_safety.py legitimately
+        # contain the blocked pattern strings as literal fixtures; they must
+        # never be flagged against themselves.
+        self._add_file("check_public_safety.py", 'BLOCKED = ["private/", "/Users/ianchia"]\n')
+        self._add_file(
+            "tests/test_public_safety.py",
+            'self.assertIn("private/", "a fixture containing private/ literally")\n',
+        )
+        self._git_add("check_public_safety.py")
+        self._git_add("tests/test_public_safety.py")
+
+        ret = main()
+        self.assertEqual(ret, 0)
+        self.assertEqual(self.mock_stderr.getvalue(), "")
+
+    def test_remediation_command_shell_quotes_filenames_with_spaces(self):
+        self._add_file("private/leak with spaces.txt", "secret")
+        self._git_add("private/leak with spaces.txt")
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        stderr = self.mock_stderr.getvalue()
+        # A filename containing a space must be quoted in the suggested
+        # remediation command so it is safe to copy-paste into a shell.
+        self.assertIn("'private/leak with spaces.txt'", stderr)
+
+    def test_studylib_pattern_definitions_excluded_from_local_path_scan_only(self):
+        # studylib.py and its test file legitimately define/exercise the
+        # local-path regex as literal fixtures — excluded from that one
+        # check, but still subject to the private/ substring check.
+        self._add_file("studylib.py", 'RAW_LOCAL_PATH_RE = re.compile(r"/Users/[^\\s]+")\n')
+        self._add_file(
+            "tests/test_studylib.py",
+            'self.assertTrue(is_absolute_local_target("/Users/example/file.md"))\n',
+        )
+        self._git_add("studylib.py")
+        self._git_add("tests/test_studylib.py")
+
+        ret = main()
+        self.assertEqual(ret, 0)
+        self.assertEqual(self.mock_stderr.getvalue(), "")
+
+    def test_studylib_still_checked_for_specific_course_path_leaks(self):
+        # studylib.py is a framework file (generic "private/" mentions are
+        # allowed there deliberately — see its own docstrings), and its
+        # local-path exclusion is narrower still. Neither exemption should
+        # become a blanket exemption from every check: a specific leaked
+        # course path must still be caught even here.
+        self._add_file(
+            "studylib.py",
+            "# example: private/courses/ABCD1234-2026-S1/materials/lecture.pdf\n",
+        )
+        self._git_add("studylib.py")
+
+        ret = main()
+        self.assertEqual(ret, 1)
+        self.assertIn("FAILED: tracked/staged files reference a specific private-course path", self.mock_stderr.getvalue())
+
+    def test_public_release_validator_failure_propagates(self):
+        self.mock_call.return_value = 1
+        ret = main()
+        self.assertEqual(ret, 1)
+        # Only the public-release validator should have been invoked; the
+        # test suite must not run once an earlier stage has already failed.
+        self.assertEqual(self.mock_call.call_count, 1)
+
+    def test_test_suite_failure_propagates(self):
+        # First call (validate_notes.py --public-release) succeeds, second
+        # call (the test suite) fails.
+        self.mock_call.side_effect = [0, 1]
+        ret = main()
+        self.assertEqual(ret, 1)
+        self.assertEqual(self.mock_call.call_count, 2)
 
     def test_staged_leak_with_clean_worktree_fails(self):
         # 1. Stage a leak

@@ -66,10 +66,10 @@ After the approved files are finalized:
 After all changes are approved and applied, run:
 
 ```bash
-make all
-make validate-public
-make pre-release
+make public-safety
+make manifest
+make review
 git status
 ```
 
-Do not weaken `make validate-public` or `make pre-release`. If either fails, identify the specific files and metadata causing the failure and propose fixes — do not skip or downgrade checks. Passing the automated checks is necessary but not sufficient: complete the manual [public release checklist](../docs/public-release-checklist.md) and manually review every file before publishing.
+Do not weaken `make public-safety`. If it fails, identify the specific files and metadata causing the failure and propose fixes — do not skip or downgrade checks. Passing the automated checks is necessary but not sufficient: complete the manual [public release checklist](../docs/public-release-checklist.md) and manually review every file before publishing.

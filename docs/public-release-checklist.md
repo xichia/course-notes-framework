@@ -22,27 +22,28 @@ Use this checklist before promoting any private material into `courses/` (the tr
 - [ ] Confirm AI-generated paraphrases do not preserve protected course expression.
 - [ ] Search for absolute local paths, home-directory paths, drive-letter paths, and file URIs.
 - [ ] Search for sensitive terms, credentials, private links, student identifiers, and personal data.
-- [ ] (Optional) Create a `.public-release-blocklist` file with private terms (university names, course codes, lecturer names, LMS hostnames) before running checks.
+- [ ] (Optional) Create a local-only `.public-release-blocklist` file with private terms (university names, course codes, lecturer names, LMS hostnames) before running checks. It is ignored by Git and must not be committed.
 
 ## Run Checks
 
 ```bash
-make pre-release
+make public-safety
+make manifest
+make review
 ```
 
 Or step by step:
 
 ```bash
-make validate-public
+make public-safety
 make manifest
 make review
-make test
 ```
 
 - [ ] Public-release validation passes with no private, course-derived, unknown-risk, unclassified notes, or suspicious source references.
 - [ ] Generated files were rebuilt from the sanitized Markdown sources.
 - [ ] Relative Markdown links resolve in the release candidate.
-- [ ] Running `make pre-release` twice produces no diff.
+- [ ] Running `make public-safety`, `make manifest`, and `make review` twice produces no diff.
 
 ## Manual Approval
 

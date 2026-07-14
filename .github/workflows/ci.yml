@@ -16,11 +16,11 @@ jobs:
           python-version: "3.x"
       - name: Use commit timestamp for deterministic generated files
         run: echo "SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)" >> "$GITHUB_ENV"
-      - name: make all
-        run: make all
-      - name: make validate-public
-        run: make validate-public
-      - name: make pre-release
-        run: make pre-release
+      - name: make public-safety
+        run: make public-safety
+      - name: Rebuild generated public views
+        run: |
+          make manifest
+          make review
       - name: Check generated files are not stale
         run: git diff --exit-code

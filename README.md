@@ -61,7 +61,7 @@ Read [docs/publication-policy.md](docs/publication-policy.md) before changing vi
 
 This repository is both the study workspace and the public Course Notes release. Tooling, templates, prompts, documentation, validation logic, and synthetic/demo content are tracked; real course notes and raw source material are kept under the Git-ignored `private/` directory.
 
-A note is private by default (`visibility: private`). A private note may live under `private/courses/` and intentionally fail `make validate-public`, because that gate only ever runs against `courses/`. A note may move into `courses/` only after it has been sanitized to `public-framework` / `public-original` / `public-open-licensed` with an allowed `source-risk` and has passed `make pre-release`.
+A note is private by default (`visibility: private`) and its first or working copy belongs under `private/courses/`. It may intentionally fail `make validate-public`, because that gate only ever runs against `courses/`. A note may move into `courses/` only after it has been sanitized to `public-framework` / `public-original` / `public-open-licensed` with an allowed `source-risk` and has passed `make public-safety`.
 
 ## Repository Structure
 
@@ -115,7 +115,7 @@ Never edit `manifest.json` or `REVIEW_QUEUE.md` manually. Update source Markdown
 | `make manifest` | Validate and rebuild `manifest.json` |
 | `make review` | Validate and rebuild `REVIEW_QUEUE.md` for today; set `DATE=YYYY-MM-DD` for a reproducible date |
 | `make test` | Run the dependency-free regression suite |
-| `make pre-release` | Run the public-release gate, regenerate all files, and run tests (for release readiness) |
+| `make pre-release` | Convenience release rebuild: run `make public-safety`, then regenerate public generated files |
 | `make all` | Run normal validation, both generators, and all tests |
 | `make reviewed NOTE=layered-recall` | Update `last-reviewed` and `review-after` for a note by ID (see below) |
 | `make reviewed NOTE=layered-recall DATE=2026-07-15` | As above, using a specific review date |
@@ -125,15 +125,15 @@ Never edit `manifest.json` or `REVIEW_QUEUE.md` manually. Update source Markdown
 | `make study-review` | Build `private/REVIEW_QUEUE.md` from study notes |
 | `make study-all` | Run study-validate, study-manifest, and study-review |
 | `make study-reviewed NOTE=<id>` | Mark a study note under `private/courses/` as reviewed |
-| `make public-safety` | Validate the public tree and run all tests |
+| `make public-safety` | Canonical publication-safety gate: check Git boundaries and tracked/staged leaks, validate the public tree, and run all tests |
 
 The equivalent direct Python commands are shown in Quickstart. Append `--study` to any tool to target `private/courses/` instead of `courses/`.
 
-CI runs on every push and pull request: `make all`, `make validate-public`, `make pre-release`, and a generated-file staleness check. See [ci.yml](.github/workflows/ci.yml).
+CI runs on every push and pull request: the canonical `make public-safety` gate, a rebuild of public generated files, and a generated-file staleness check. See [ci.yml](.github/workflows/ci.yml). Remote CI can ratify a change only after it is pushed.
 
 ### Optional blocklist
 
-Create `.public-release-blocklist` in the repository root with one term per line to extend `make validate-public`. Lines starting with `#` and blank lines are ignored. Matching is case-insensitive.
+Create `.public-release-blocklist` in the repository root with one term per line to extend `make validate-public`. This local-only file is ignored by Git by default; do not commit it. Lines starting with `#` and blank lines are ignored. Matching is case-insensitive.
 
 ```text
 # Lines starting with # are comments.
@@ -176,15 +176,17 @@ Run `make all` after the update to regenerate the manifest and review queue.
 
 The full copy-and-check workflow is in [docs/course-onboarding.md](docs/course-onboarding.md). In short:
 
-1. Create `courses/<course-code>/` with `concepts/`, `lectures/`, `problem-sheets/`, and `exam/`.
-2. Copy `templates/course.md` to `courses/<course-code>/course.md` and replace every placeholder.
-3. Copy `templates/syllabus.md` to `courses/<course-code>/syllabus.md`; add only official or explicitly sourced material.
-4. Copy `templates/lecture.md` into `lectures/` for each raw chronological lecture record.
+1. Create `private/courses/<course-code>/` with `concepts/`, `lectures/`, `problem-sheets/`, and `exam/`.
+2. Copy `templates/course.md` to `private/courses/<course-code>/course.md` and replace every placeholder.
+3. Copy `templates/syllabus.md` to `private/courses/<course-code>/syllabus.md`; add only official or explicitly sourced material.
+4. Copy `templates/lecture.md` into `private/courses/<course-code>/lectures/` for each raw chronological lecture record.
 5. Use `prompts/import-lecture.md` to propose durable concept extraction, then create approved concepts from `TEMPLATE.md`.
-6. Put attempts, corrections, and evidenced mistakes under `problem-sheets/`.
-7. Put confirmed exam information and outcome maps under `exam/`.
-8. Run `make validate`.
-9. Run `make manifest`, `make review`, and `make test` (or simply `make all`).
+6. Put attempts, corrections, and evidenced mistakes under `private/courses/<course-code>/problem-sheets/`.
+7. Put confirmed exam information and outcome maps under `private/courses/<course-code>/exam/`.
+8. Run `make study-validate`.
+9. Run `make study-manifest`, `make study-review`, and `make test` (or `make study-all` followed by `make test`).
+
+`courses/` is not the onboarding destination for real material. Use it only when a sanitized public candidate is ready for the separate publication workflow.
 
 Set every document's `course` field to the exact directory name. Keep raw lecture notes intact, preserve source paths, and keep missing official information visibly unknown.
 
@@ -192,7 +194,7 @@ After the first import, run the ten-minute [course import friction test](docs/fr
 
 ## Add a Concept Note
 
-1. Copy `TEMPLATE.md` to `courses/<course-code>/concepts/readable-filename.md`.
+1. Copy `TEMPLATE.md` to `private/courses/<course-code>/concepts/readable-filename.md`.
 2. Give it a repository-unique, permanent `id`. For new notes, `<course-code>-<concept-slug>` is a useful convention.
 3. Fill in every metadata field and write the note in your own words.
 4. Use note IDs, not filenames, in `prerequisites` and `related`.
@@ -322,7 +324,7 @@ Every workflow must distinguish repository evidence from external explanation, p
 
 `validate_notes.py` catches missing fields, malformed dates/lists, malformed structured mistakes, invalid status/weight/visibility/source-risk values, duplicate IDs, broken ID and Markdown links, absolute machine-specific links anywhere in repository Markdown, type/course-directory mismatches, title mismatches, and missing concept sections such as Practice Questions. Errors name the affected file and field or section, show the bad value when useful, and suggest a repair. The command exits non-zero on errors.
 
-`python3 validate_notes.py --public-release` (or `make validate-public`) adds a conservative publication gate. It fails on private visibility, course-derived or unknown source risk, missing publication classifications, and local paths. Do not weaken this check to make a real private repository pass.
+`python3 validate_notes.py --public-release` (or `make validate-public`) is the validation component of the canonical `make public-safety` gate. It fails on private visibility, course-derived or unknown source risk, missing publication classifications, and local paths. Do not weaken this check to make a real private repository pass.
 
 `build_manifest.py` and `build_review_queue.py` validate before writing. They will not replace their outputs when notes are malformed. `manifest.json` carries a top-level `_generated` warning; `REVIEW_QUEUE.md` begins with a generated-file HTML comment. Never edit either file manually: change the source Markdown and rebuild it.
 

@@ -22,4 +22,4 @@ Most prompts work with a private study repository. Some can also help prepare pu
 
 ## Publication-Safety Reminder
 
-Prompts that process raw lecture or source material are designed for private study. Do not use prompts to turn raw lecture or source material into public-facing content unless you are explicitly sanitizing it and `make validate-public` / `make pre-release` pass. AI summarization, rewriting, or paraphrasing alone does not make course material safe to publish. Keep `visibility` and `source-risk` metadata conservative.
+Prompts that process raw lecture or source material are designed for private study. Do not use prompts to turn raw lecture or source material into public-facing content unless you are explicitly sanitizing it and the canonical `make public-safety` gate passes. AI summarization, rewriting, or paraphrasing alone does not make course material safe to publish. Keep `visibility` and `source-risk` metadata conservative.

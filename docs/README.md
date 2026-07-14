@@ -6,7 +6,7 @@ This directory contains the operational guides for the course-notes system. Cour
 
 | Guide | Use it when |
 |---|---|
-| [Course onboarding](course-onboarding.md) | Adding a real module, its syllabus, lectures, concepts, problem sheets, and exam material |
+| [Course onboarding](course-onboarding.md) | Adding real material under ignored `private/courses/` before any separate public promotion |
 | [Course import friction test](friction-test.md) | Checking whether a newly imported course is quick to navigate, study, and update |
 | [LLM guide](../LLM_GUIDE.md) | Giving an LLM the repository's retrieval, evidence, and editing rules |
 | [Publication policy](publication-policy.md) | Deciding what belongs in the tracked `courses/` tree and what stays under `private/` |
@@ -18,10 +18,10 @@ This directory contains the operational guides for the course-notes system. Cour
 
 | Template | Destination |
 |---|---|
-| [Course metadata](../templates/course.md) | `courses/<course-code>/course.md` |
-| [Syllabus](../templates/syllabus.md) | `courses/<course-code>/syllabus.md` |
-| [Raw lecture](../templates/lecture.md) | `courses/<course-code>/lectures/yyyy-mm-dd-topic.md` |
-| [Concept note](../TEMPLATE.md) | `courses/<course-code>/concepts/concept-name.md` |
+| [Course metadata](../templates/course.md) | `private/courses/<course-code>/course.md` by default |
+| [Syllabus](../templates/syllabus.md) | `private/courses/<course-code>/syllabus.md` by default |
+| [Raw lecture](../templates/lecture.md) | `private/courses/<course-code>/lectures/yyyy-mm-dd-topic.md` by default |
+| [Concept note](../TEMPLATE.md) | `private/courses/<course-code>/concepts/concept-name.md` by default |
 
 ## Study Workflows
 

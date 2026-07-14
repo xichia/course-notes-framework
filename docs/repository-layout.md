@@ -78,7 +78,8 @@ Keeping material there is **not** sanitization: promoting a private note into
 - The public `make manifest`, `make review`, and `make validate` still operate on
   `courses/` only. Private notes never leak into the public generated files.
 - To publish a note, sanitize it into a `courses/<course>/` file with an allowed
-  `visibility` and `source-risk`, then run `make pre-release`.
-- Run `make public-safety` to validate the public tree and run all tests.
+  `visibility` and `source-risk`, then run the canonical `make public-safety` gate.
+- `make pre-release` is a convenience target that runs that gate and rebuilds the
+  public generated files.
 - `private/` is deliberately untracked: back it up independently, since Git
   provides no history for its contents.

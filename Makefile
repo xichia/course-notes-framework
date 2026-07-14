@@ -20,10 +20,9 @@ test:
 	$(PYTHON) -m unittest discover -s tests -v
 
 pre-release:
-	$(PYTHON) validate_notes.py --public-release
+	$(MAKE) public-safety
 	$(PYTHON) build_manifest.py
 	$(PYTHON) build_review_queue.py
-	$(PYTHON) -m unittest discover -s tests -v
 
 reviewed:
 	$(PYTHON) mark_reviewed.py $(NOTE) $(DATE:%=--date %)
