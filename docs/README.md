@@ -38,6 +38,8 @@ Reusable LLM prompts live under [prompts/README.md](../prompts/README.md). Begin
 - [Sanitize a private repository for public release](../prompts/sanitize-for-public-release.md)
 - [Evidence-based status update](../prompts/update-status.md)
 - [Weekly review](../prompts/weekly-review.md)
+- [Sync LMS course content](../prompts/sync-lms-course-content.md) — announcements and unit materials
+- [Sync LMS announcements](../prompts/sync-lms-announcements.md) — the announcement layer in detail
 
 ## Maintenance
 

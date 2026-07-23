@@ -51,6 +51,13 @@ The entire `private/` directory is ignored by Git (see the `private/` rule in
 - `private/courses/` mirrors the `courses/` layout for private notes. A private
   note keeps `visibility: private` and an honest `source-risk`; it may
   intentionally fail `make validate-public`, but that gate never scans it.
+  Some courses additionally keep an `admin/announcements/` subfolder with LMS
+  announcement captures, and an `lms-import/` subfolder with captured pages,
+  downloaded materials, and the inventories that track them. See
+  [`prompts/sync-lms-course-content.md`](../prompts/sync-lms-course-content.md)
+  for the full sync workflow and
+  [`prompts/sync-lms-announcements.md`](../prompts/sync-lms-announcements.md)
+  for the announcement conventions in detail.
 - `private/raw/` holds raw source material (slides, handouts, transcripts, LMS
   exports) that must never be committed.
 - `private/drafts/` holds work in progress.

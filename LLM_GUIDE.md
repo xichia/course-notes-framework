@@ -83,3 +83,26 @@ When asked to improve or create notes:
 - Treat a status change as an evidence-based proposal. One correct answer or a prose cleanup is not enough to claim durable mastery.
 
 Reusable instructions for these workflows live in `prompts/`. Use `prompts/import-lecture.md` for proposal-first lecture extraction, `prompts/daily-study.md` for the normal study loop, `prompts/update-status.md` for an evidence-based status decision, and `prompts/weekly-review.md` for planning.
+
+## LMS Synchronization (Announcements and Course Content)
+
+Private course packs mirror each course's LMS: announcements under
+`admin/announcements/`, and captured pages and downloaded materials under `lms-import/`,
+separately from study content.
+
+For any routine check of what's new on the LMS, use
+`prompts/sync-lms-course-content.md`. It is the single authoritative instruction and
+covers both halves — announcements *and* newly released or updated unit materials. It
+names the one script that runs the sync, how active courses and their LMS IDs are
+discovered and verified, which locations are monitored, how live content is compared with
+stored records, where each content type belongs, how earlier versions are preserved, the
+provenance and hashing conventions, the targeted validation to run, and the security and
+Git boundaries that apply.
+
+`prompts/sync-lms-announcements.md` remains the detailed reference for the announcement
+schema, hash rule, and reconciliation conventions that the tooling implements. Read the
+course-content prompt first; consult the announcements one for that layer's specifics.
+
+A sync is maintenance, not a course-content or repository audit: it touches only
+`admin/announcements/` and `lms-import/`, never `study/`, `materials/`, or note metadata.
+Everything it writes stays inside the Git-ignored private tree, unstaged and uncommitted.

@@ -26,6 +26,8 @@ Most prompts work with a private study repository. Some can also help prepare pu
 | [`weekly-review.md`](weekly-review.md) | Plan a week of review targeting weak topics and stale dates | No — works with private notes and mistakes |
 | [`generate-study-module.md`](generate-study-module.md) | Generate one bounded, source-linked study module from a curated private source pack | No — works with private course material |
 | [`generate-course-study-index.md`](generate-course-study-index.md) | Connect completed study modules into a course-level index and revision plan | No — works with private course material |
+| [`sync-lms-course-content.md`](sync-lms-course-content.md) | **Start here for any LMS sync.** Routine check for new or updated announcements *and* unit materials across every active course | No — works with private LMS records |
+| [`sync-lms-announcements.md`](sync-lms-announcements.md) | The announcement layer of that sync in detail: schema, hash rule, and reconciliation conventions | No — works with private LMS records |
 
 ## Publication-Safety Reminder
 
