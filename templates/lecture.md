@@ -25,6 +25,8 @@ source-risk: lecture-derived
 - Date: YYYY-MM-DD
 - Lecturer: Name or Unknown
 - Materials: Add official references.
+- Recording or transcript: Path to the stored source, or `None`. Keep the file itself
+  in an ignored source-material directory and cite it here; never paste it in below.
 
 ## Raw Notes
 
@@ -41,3 +43,7 @@ _Preserve what was actually presented. Mark gaps and uncertainty instead of comp
 ## Source References
 
 - _Add slide numbers, timestamps, board-photo references, or readings._
+- _Working from a recording transcript? Cite stable timestamps rather than copying
+  passages, and prefer the written course materials for code, commands, and numeric
+  values — automatic speech recognition renders those unreliably. See
+  `docs/lecture-transcripts.md`._

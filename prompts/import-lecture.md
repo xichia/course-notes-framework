@@ -19,6 +19,19 @@ Read `manifest.json` first, then the course's `course.md`, `syllabus.md`, the ra
 - Preserve `visibility: private` and the existing `source-risk`; lecture extraction does not make the result public or original.
 - Do not change note status; lecture import is not evidence of recall.
 
+## If the Source Is a Recording Transcript
+
+See `docs/lecture-transcripts.md` for the full contract. In addition to the rules above:
+
+- Treat the transcript as source evidence. Leave the raw file byte-for-byte intact, and store it in an ignored source-material directory rather than beside the notes.
+- Normalize it to a timestamp-anchored `.txt` before reading it for content. Do not write a normalized transcript as `.md`; every `.md` under the courses directory except `README.md` is validated as a note and will fail.
+- Cite stable timestamp anchors. Never bulk-copy the transcript into a note, and never quote a passage where a citation would do.
+- Prefer the written course materials for code, commands, filenames, and numeric values. Automatic speech recognition renders these unreliably, so a transcript is evidence of *which* example was shown, not of how it is spelled. Say so in the note when you rely on the written material instead.
+- Distinguish what the lecture stated from your inference and from study heuristics, and label each claim accordingly.
+- Record acquisition, transformation, retained timestamps and speaker labels, the authoritative file to cite, and known transcript defects in a provenance record beside the transcript.
+- Pass speaker labels through unchanged. Never resolve or infer a name the export did not contain.
+- Where a transcript claim can be checked against material already committed to the repository, check it and report agreement or conflict explicitly.
+
 ## First Response: Proposal Only
 
 Return:

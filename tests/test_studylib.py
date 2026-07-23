@@ -146,10 +146,43 @@ class StudyLibTests(unittest.TestCase):
         self.assertEqual([], validate_repository([lecture]))
         self.assertFalse(is_review_candidate(lecture))
 
+    def test_lecture_template_carries_transcript_provenance_affordance(self):
+        lecture = note_from_template("lecture.md", "lectures/yyyy-mm-dd-topic.md")
+        self.assertIn("Recording or transcript:", lecture.body)
+        self.assertIn("docs/lecture-transcripts.md", lecture.body)
+
+    def test_transcript_guidance_documents_the_evidence_contract(self):
+        doc = (ROOT / "docs" / "lecture-transcripts.md").read_text(encoding="utf-8")
+        for marker in (
+            "## Publication safety",
+            "## The four artifacts",
+            "## Normalized transcripts are not notes",
+            "## Provenance to record",
+            "## Speaker labels",
+        ):
+            self.assertIn(marker, doc)
+        # The .txt rule exists because .md would enter the note-validation set.
+        self.assertIn("`.txt`, not `.md`", doc)
+        self.assertIn("discover_note_paths()", doc)
+
+    def test_import_lecture_prompt_covers_transcript_sources(self):
+        prompt = (ROOT / "prompts" / "import-lecture.md").read_text(encoding="utf-8")
+        self.assertIn("If the Source Is a Recording Transcript", prompt)
+        self.assertIn("byte-for-byte intact", prompt)
+        self.assertIn("Never bulk-copy the transcript into a note", prompt)
+        self.assertIn("Never resolve or infer a name the export did not contain", prompt)
+
+    def test_source_material_directories_are_ignored_by_default(self):
+        """Transcripts and recordings must be ignored without any per-course setup."""
+        gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+        for directory in ("transcripts/", "recordings/", "slides/", "handouts/"):
+            self.assertIn(directory, gitignore)
+
     def test_onboarding_prompt_and_checklists_exist(self):
         required = [
             "docs/course-onboarding.md",
             "docs/friction-test.md",
+            "docs/lecture-transcripts.md",
             "docs/publication-policy.md",
             "docs/public-release-checklist.md",
             "prompts/import-lecture.md",

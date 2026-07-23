@@ -2,7 +2,7 @@
 
 # Review Queue
 
-Generated for **2026-07-21** from note frontmatter, structured mistake logs, and practice coverage.
+Generated for **2026-07-23** from note frontmatter, structured mistake logs, and practice coverage.
 
 Scores are additive and intentionally simple. They rank study attention; they do not measure ability.
 
@@ -20,7 +20,7 @@ Scores are additive and intentionally simple. They rank study attention; they do
 
 | Priority | Note | Course / topic | Why it is ranked here | Suggested action |
 |---:|---|---|---|---|
-| 96 | [Layered Recall](courses/demo-course/concepts/layered-recall.md) | demo-course / study-methods | learning status (+26); medium exam weight (+14); reviewed 20 days ago (+13); overdue by 13 days (+43) | Explain it from memory and test one representative problem. |
+| 100 | [Layered Recall](courses/demo-course/concepts/layered-recall.md) | demo-course / study-methods | learning status (+26); medium exam weight (+14); reviewed 22 days ago (+15); overdue by 15 days (+45) | Explain it from memory and test one representative problem. |
 
 ## Upcoming / Maintained
 
