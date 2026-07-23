@@ -9,6 +9,7 @@ This directory contains the operational guides for the course-notes system. Cour
 | [Adopting the framework](adopting-the-framework.md) | Maintaining a personal copy, preserving upstream, and backing up ignored work |
 | [Course onboarding](course-onboarding.md) | Adding real material under ignored `private/courses/` before any separate public promotion |
 | [Course import friction test](friction-test.md) | Checking whether a newly imported course is quick to navigate, study, and update |
+| [Lecture transcripts](lecture-transcripts.md) | Bringing a lecture recording transcript into the repository as source evidence, not a note |
 | [LLM guide](../LLM_GUIDE.md) | Giving an LLM the repository's retrieval, evidence, and editing rules |
 | [Publication policy](publication-policy.md) | Deciding what belongs in the tracked `courses/` tree and what stays under `private/` |
 | [Repository layout](repository-layout.md) | One-folder workflow: tracked `courses/` plus the Git-ignored `private/` directory |
