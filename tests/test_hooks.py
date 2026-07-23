@@ -13,25 +13,39 @@ import unittest
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
-TEST_TMP = REPO_ROOT / ".test_tmp"
+
+# This module's own disposable directory under the repo root (never the real
+# ignored course-data tree, never a name shared with another test module).
+# Using a uniquely-suffixed TemporaryDirectory instead of a fixed ".test_tmp"
+# name means this module can never collide with another module's temp root,
+# even if a previous run left residue behind.
+_MODULE_TMP = None
 
 
 def setUpModule():
-    # Keep synthetic Git repositories inside the disposable public-repository
-    # test boundary, never under the real ignored course-data tree. This module
-    # exclusively owns the shared parent for the duration of its tests.
-    TEST_TMP.mkdir()
+    global _MODULE_TMP
+    _MODULE_TMP = tempfile.TemporaryDirectory(dir=REPO_ROOT, prefix=".test_tmp-hooks-")
 
 
 def tearDownModule():
-    TEST_TMP.rmdir()
-    if TEST_TMP.exists():
-        raise AssertionError(f"temporary test root still exists: {TEST_TMP}")
+    # Detect leaked per-test directories before cleaning up: if any test's
+    # own TemporaryDirectory (registered via addCleanup in setUp) failed to
+    # remove itself, that is a real defect worth surfacing loudly rather than
+    # silently rmtree'd away. The cleanup itself always runs regardless, so a
+    # leak is reported but never left behind afterward.
+    try:
+        leftovers = sorted(p.name for p in Path(_MODULE_TMP.name).iterdir())
+        assert not leftovers, f"per-test temp dirs leaked: {leftovers}"
+    finally:
+        _MODULE_TMP.cleanup()
 
 
 class TestHooks(unittest.TestCase):
     def setUp(self):
-        self.temp_dir = tempfile.TemporaryDirectory(dir=TEST_TMP)
+        self.temp_dir = tempfile.TemporaryDirectory(dir=_MODULE_TMP.name)
+        # addCleanup (not tearDown) so this test's own temp dir is removed
+        # even if a later step in setUp below raises before completing.
+        self.addCleanup(self.temp_dir.cleanup)
         self.root = Path(self.temp_dir.name)
 
         subprocess.run(["git", "init", "-b", "main"], cwd=self.root, check=True, capture_output=True)
@@ -42,9 +56,6 @@ class TestHooks(unittest.TestCase):
         (self.root / "scripts").mkdir()
         shutil.copy(REPO_ROOT / "scripts" / "pre-commit", self.root / "scripts" / "pre-commit")
         shutil.copy(REPO_ROOT / "scripts" / "pre-push", self.root / "scripts" / "pre-push")
-
-    def tearDown(self):
-        self.temp_dir.cleanup()
 
     def _make(self, *targets):
         return subprocess.run(
